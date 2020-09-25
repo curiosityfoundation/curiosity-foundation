@@ -1,0 +1,37 @@
+################################################################################
+# Use Balena Debian Stretch Python base image
+
+FROM balenalib/%%RESIN_MACHINE_NAME%%-node:8-run
+
+RUN ["cross-build-start"]
+
+################################################################################
+# Install wifi-connect dependencies
+
+# RUN install_packages dnsmasq curl
+
+RUN install_packages dnsmasq wireless-tools python make g++
+
+WORKDIR /usr/src/app
+
+################################################################################
+# Install wifi-connect binary
+
+RUN curl https://api.github.com/repos/balena-io/wifi-connect/releases/latest -s \
+    | grep -hoP 'browser_download_url": "\K.*%%RESIN_ARCH%%\.tar\.gz' \
+    | xargs -n1 curl -Ls \
+    | tar -xvz -C /usr/src/app/
+
+################################################################################
+# Install node application dependencies
+
+COPY package.json package.json
+
+COPY main.js main.js
+
+################################################################################
+# Run application
+
+ENV DBUS_SYSTEM_BUS_ADDRESS unix:path=/host/run/dbus/system_bus_socket
+
+CMD ["node", "main.js"]

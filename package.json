@@ -9,6 +9,7 @@
     "test": "nx test",
     "lint": "nx workspace-lint && nx lint",
     "e2e": "nx e2e",
+    "deploy:device": "node tools/scripts/build-device.js && balena push demo --source dist/apps/device",
     "affected:apps": "nx affected:apps",
     "affected:libs": "nx affected:libs",
     "affected:build": "nx affected:build",
@@ -26,15 +27,26 @@
     "help": "nx help"
   },
   "private": true,
+  "deviceDependencies": [],
   "dependencies": {},
   "devDependencies": {
+    "@nrwl/eslint-plugin-nx": "10.2.1",
+    "@nrwl/jest": "10.2.1",
+    "@nrwl/node": "10.2.1",
     "@nrwl/workspace": "10.2.1",
+    "@nx-tools/nx-docker": "^0.4.1",
+    "@types/jest": "26.0.8",
     "@types/node": "~8.9.4",
+    "@typescript-eslint/eslint-plugin": "2.19.2",
+    "@typescript-eslint/parser": "2.19.2",
     "dotenv": "6.2.0",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.0.0",
+    "jest": "26.2.2",
+    "prettier": "2.0.4",
+    "ts-jest": "26.1.4",
     "ts-node": "~7.0.0",
     "tslint": "~6.0.0",
-    "eslint": "6.8.0",
-    "typescript": "~3.9.3",
-    "prettier": "2.0.4"
+    "typescript": "~3.9.3"
   }
 }
