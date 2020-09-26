@@ -14,9 +14,7 @@
             "outputPath": "dist/apps/device",
             "main": "apps/device/src/main.ts",
             "tsConfig": "apps/device/tsconfig.app.json",
-            "assets": [
-              "apps/device/src/assets"
-            ]
+            "assets": ["apps/device/src/assets"]
           },
           "configurations": {
             "production": {
@@ -46,16 +44,39 @@
               "apps/device/tsconfig.app.json",
               "apps/device/tsconfig.spec.json"
             ],
-            "exclude": [
-              "**/node_modules/**",
-              "!apps/device/**/*"
-            ]
+            "exclude": ["**/node_modules/**", "!apps/device/**/*"]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "apps/device/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "types-messages": {
+      "root": "libs/types-messages",
+      "sourceRoot": "libs/types-messages/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": [
+              "libs/types-messages/tsconfig.lib.json",
+              "libs/types-messages/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/types-messages/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/types-messages/jest.config.js",
             "passWithNoTests": true
           }
         }

@@ -15,7 +15,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@curiosity-foundation/types-messages": [
+        "libs/types-messages/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
