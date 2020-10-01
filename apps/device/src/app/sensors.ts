@@ -1,7 +1,7 @@
 import * as T from '@effect-ts/core/Effect';
 import * as S from '@effect-ts/core/Effect/Stream';
-import * as Shedule from '@effect-ts/system/Schedule';
 import { pipe } from '@effect-ts/core/Function';
+import * as Schedule from '@effect-ts/system/Schedule';
 import * as A from 'fp-ts/Array';
 import * as IO from 'fp-ts/IO';
 import * as rpio from 'rpio';
@@ -26,11 +26,21 @@ const takeReading = (channel: number): IO.IO<number> => () => {
 const acquireGpio = T.effectTotal(rpio.spiBegin);
 const releaseGpio = () => T.effectTotal(rpio.spiEnd);
 
-export const sense = pipe(
+export const SensorConfigURI = 'SensorConfigUri';
+export type SensorConfigURI = typeof SensorConfigURI;
+
+export type SensorConfig = {
+    [SensorConfigURI]: {
+        readInterval: number;
+    };
+};
+
+export const readFromSensors = pipe(
     S.bracket(releaseGpio)(acquireGpio),
-    S.chain(() => S.fromSchedule(Shedule.fixed(1000))),
+    S.chain(() => S.access(({ [SensorConfigURI]: config }: SensorConfig) => config)),
+    S.chain((config) => S.fromSchedule(Schedule.fixed(config.readInterval))),
     S.chain(() => pipe(
-        A.range(0, 7),
+        [0, 5],
         A.map(takeReading),
         A.sequence(IO.io),
         T.effectTotal,
