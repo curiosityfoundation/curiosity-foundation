@@ -4,30 +4,43 @@ import { pipe } from '@effect-ts/core/Function';
 import * as rpio from 'rpio';
 import { ADTType } from '@morphic-ts/adt';
 
-import { DeviceMessage, DeviceResults } from '@curiosity-foundation/types-messages';
+import { verbose } from '@curiosity-foundation/service-logger';
+import { DeviceMessage, DeviceResult } from '@curiosity-foundation/types-messages';
 
-const acquirePump = T.effectTotal(() => {
-    rpio.open(4, rpio.OUTPUT, rpio.LOW);
-});
+const acquirePin = pipe(
+    verbose('acquiring rpio 4'),
+    T.andThen(T.effectPartial(() => 'failed to release rpio 4')(
+        () => {
+            rpio.open(4, rpio.OUTPUT, rpio.LOW);
+        })),
+    T.catchAllCause((cause) => T.succeed(DeviceResult.of.Failure({ cause })))
+);
 
-const releasePump = () => T.effectTotal(() => {
-    rpio.close(4);
-});
+const releasePin = () => pipe(
+    verbose('releasing rpio 4'),
+    T.andThen(T.effectPartial(() => 'failed to release rpio 4')(
+        () => {
+            rpio.close(4);
+        })),
+    T.catchAllCause((cause) => T.succeed(DeviceResult.of.Failure({ cause })))
+);
 
 const startPump = pipe(
-    T.effectTotal(() => {
-        console.log('startPump');
+    verbose(`writing ${rpio.HIGH} to rpio 4`),
+    T.andThen(T.effectTotal(() => {
         rpio.write(4, rpio.HIGH);
-    }),
-    T.map(() => DeviceResults.of.PumpStarted({}))
+    })),
+    T.map(() => DeviceResult.of.PumpStarted({})),
+    T.catchAllCause(() => T.succeed(DeviceResult.of.Failure({})))
 );
 
 const stopPump = pipe(
-    T.effectTotal(() => {
-        console.log('stopPump');
-        rpio.write(7, rpio.LOW);
-    }),
-    T.map(() => DeviceResults.of.PumpStopped({}))
+    verbose(`writing ${rpio.LOW} to rpio 4`),
+    T.andThen(T.effectTotal(() => {
+        rpio.write(4, rpio.LOW);
+    })),
+    T.map(() => DeviceResult.of.PumpStopped({})),
+    T.catchAllCause(() => T.succeed(DeviceResult.of.Failure({})))
 );
 
 const PumpMessage = DeviceMessage.select([
@@ -39,10 +52,10 @@ type PumpMessage = ADTType<typeof PumpMessage>;
 
 export const handlePumpMessage = (msg: PumpMessage) =>
     pipe(
-        S.bracket(releasePump)(acquirePump),
+        S.bracket(releasePin)(acquirePin),
         S.chain(() => pipe(
             msg,
-            PumpMessage.matchStrict({
+            PumpMessage.match({
                 StartPump: () => startPump,
                 StopPump: () => stopPump,
             }),

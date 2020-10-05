@@ -40,6 +40,9 @@
     },
     "service-communication": {
       "tags": []
+    },
+    "morphic-redux": {
+      "tags": []
     }
   }
 }

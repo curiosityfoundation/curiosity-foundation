@@ -6,17 +6,10 @@ import * as Schedule from '@effect-ts/system/Schedule';
 import { DeviceMessage } from '@curiosity-foundation/types-messages';
 import { log } from '@curiosity-foundation/service-logger';
 
-export const SensorConfigURI = 'SensorConfigUri';
-export type SensorConfigURI = typeof SensorConfigURI;
-
-export type SensorConfig = {
-    [SensorConfigURI]: {
-        readInterval: number;
-    };
-};
+import { DeviceConfig, DeviceConfigURI } from './constants';
 
 export const receiveScheduledMessages = pipe(
-    T.access(({ [SensorConfigURI]: config }: SensorConfig) => config),
+    T.access(({ [DeviceConfigURI]: config }: DeviceConfig) => config),
     T.tap((config) => log(`starting fixed schedule of ${config.readInterval}ms`)),
     T.map((config) => pipe(
         S.fromSchedule(Schedule.fixed(config.readInterval)),

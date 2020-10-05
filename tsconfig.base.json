@@ -24,7 +24,8 @@
       ],
       "@curiosity-foundation/service-communication": [
         "libs/service-communication/src/index.ts"
-      ]
+      ],
+      "@curiosity-foundation/morphic-redux": ["libs/morphic-redux/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

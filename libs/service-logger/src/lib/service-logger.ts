@@ -18,3 +18,8 @@ export const warn = (message: string) => pipe(
     T.access(({ [LoggerURI]: logger }: Logger) => logger),
     T.chain((logger) => T.effectTotal(() => { logger.warn('info', message); })),
 );
+
+export const verbose = (message: string) => pipe(
+    T.access(({ [LoggerURI]: logger }: Logger) => logger),
+    T.chain((logger) => T.effectTotal(() => { logger.verbose(message); })),
+);

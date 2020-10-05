@@ -1,57 +1,61 @@
-import { summonFor } from '@morphic-ts/batteries/lib/summoner-BASTJ';
-import * as t from 'io-ts';
+import { summonFor, AsOpaque } from '@morphic-ts/batteries/lib/summoner-ESBST';
+import { AOfMorhpADT, AType, EType } from "@morphic-ts/summoners";
 
 const { summon, tagged } = summonFor<{}>({});
 
-export const TakeMoistureReading = summon((F) =>
+const TakeMoistureReading_ = summon((F) =>
     F.interface(
         {
-            _tag: F.stringLiteral('TakeMoistureReading'),
+            type: F.stringLiteral('TakeMoistureReading'),
         },
         'TakeMoistureReading',
     ),
 );
+export type TakeMoistureReading = AType<typeof TakeMoistureReading_>;
+type TakeMoistureReadingRaw = EType<typeof TakeMoistureReading_>;
+export const TakeMoistureReading = AsOpaque<TakeMoistureReadingRaw, TakeMoistureReading>()(TakeMoistureReading_);
 
-export type TakeMoistureReading = t.TypeOf<typeof TakeMoistureReading.type>;
-
-export const TakeLightReading = summon((F) =>
+const TakeLightReading_ = summon((F) =>
     F.interface(
         {
-            _tag: F.stringLiteral('TakeLightReading'),
+            type: F.stringLiteral('TakeLightReading'),
         },
         'TakeLightReading',
     ),
 );
+export type TakeLightReading = AType<typeof TakeLightReading_>;
+type TakeLightReadingRaw = EType<typeof TakeLightReading_>;
+export const TakeLightReading = AsOpaque<TakeLightReadingRaw, TakeLightReading>()(TakeLightReading_);
 
-export type TakeLightReading = t.TypeOf<typeof TakeLightReading.type>;
-
-export const StopPump = summon((F) =>
+const StopPump_ = summon((F) =>
     F.interface(
         {
-            _tag: F.stringLiteral('StopPump'),
+            type: F.stringLiteral('StopPump'),
         },
         'StopPump',
     ),
 );
+export type StopPump = AType<typeof StopPump_>;
+type StopPumpRaw = EType<typeof StopPump_>;
+export const StopPump = AsOpaque<StopPumpRaw, StopPump>()(StopPump_);
 
-export type StopPump = t.TypeOf<typeof StopPump.type>;
-
-export const StartPump = summon((F) =>
+const StartPump_ = summon((F) =>
     F.interface(
         {
-            _tag: F.stringLiteral('StartPump'),
+            type: F.stringLiteral('StartPump'),
         },
         'StartPump',
     ),
 );
+export type StartPump = AType<typeof StartPump_>;
+type StartPumpRaw = EType<typeof StartPump_>;
+export const StartPump = AsOpaque<StartPumpRaw, StartPump>()(StartPump_);
 
-export type StartPump = t.TypeOf<typeof StartPump.type>;
-
-export const DeviceMessage = tagged('_tag')({
+export const DeviceMessage = tagged('type')({
     TakeMoistureReading,
     TakeLightReading,
     StopPump,
     StartPump,
 });
 
-export type DeviceMessage = t.TypeOf<typeof DeviceMessage.type>;
+export type DeviceMessage = AOfMorhpADT<typeof DeviceMessage>;

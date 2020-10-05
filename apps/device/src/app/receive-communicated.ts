@@ -5,25 +5,38 @@ import * as E from 'fp-ts/Either';
 
 import { CommunicationEvent, listen } from '@curiosity-foundation/service-communication';
 import { DeviceMessage } from '@curiosity-foundation/types-messages';
-import { log } from '@curiosity-foundation/service-logger';
+import { log, verbose } from '@curiosity-foundation/service-logger';
+
+import { DeviceConfig, DeviceConfigURI } from './constants';
 
 export const receiveCommunicatedMessages = pipe(
-    log('listening for communicated messages'),
-    T.andThen(pipe(
-        listen([String(process.env.BALENA_DEVICE_NAME_AT_INIT)]),
-        S.chain(CommunicationEvent.matchStrict({
-            publishResponse: () => S.empty,
-            status: () => S.empty,
-            message: ({ message }) => pipe(
-                message,
-                DeviceMessage.type.decode,
-                E.fold(
-                    () => S.empty,
-                    (msg) => S.fromArray([msg]),
+    T.access(({ [DeviceConfigURI]: config }: DeviceConfig) => config),
+    T.chain((config) => pipe(
+        log(`listening for messages on channel ${config.readChannel}`),
+        T.andThen(pipe(
+            listen([config.readChannel]),
+            S.chain((ev) => S.fromEffect(pipe(
+                verbose(`${ev._tag} communication event received`),
+                T.andThen(T.succeed(ev)),
+            ))),
+            S.mapConcat(CommunicationEvent.matchStrict<DeviceMessage[]>({
+                publishResponse: () => [],
+                presence: () => [],
+                status: () => [],
+                message: ({ message }) => pipe(
+                    message,
+                    DeviceMessage.type.decode,
+                    E.fold(
+                        () => [],
+                        (msg) => [msg],
+                    ),
                 ),
-            ),
-            presence: () => S.empty,
-        })),
-        T.succeed,
-    ))
+            })),
+            S.chain((msg) => S.fromEffect(pipe(
+                verbose(`${msg.type} message decoded`),
+                T.andThen(T.succeed(msg)),
+            ))),
+            T.succeed,
+        )),
+    )),
 );

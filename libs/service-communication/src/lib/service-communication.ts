@@ -3,6 +3,7 @@ import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
 
 import { ADTType, ofType, makeADT } from '@morphic-ts/adt';
+import { verbose } from '@curiosity-foundation/service-logger';
 import * as Pubnub from 'pubnub';
 
 export const CommunicationURI = 'CommunicationURI';
@@ -21,27 +22,32 @@ export const CommunicationEvent = makeADT('_tag')({
 
 export type CommunicationEvent = ADTType<typeof CommunicationEvent>;
 
-const subscribe = (channels: string[]) =>
-    T.accessM(({ [CommunicationURI]: communication }: Communication) =>
+const subscribe = (channels: string[]) => pipe(
+    verbose(`subscribing to channels ${channels}`),
+    T.andThen(T.accessM(({ [CommunicationURI]: communication }: Communication) =>
         T.effectTotal(() => communication.subscribe({ channels })),
-    );
+    )),
+);
 
-const unsubscribe = (channels: string[]) =>
-    T.accessM(({ [CommunicationURI]: communication }: Communication) =>
+const unsubscribe = (channels: string[]) => () => pipe(
+    verbose(`unsubscribing to channels ${channels}`),
+    T.andThen(T.accessM(({ [CommunicationURI]: communication }: Communication) =>
         T.effectTotal(() => communication.unsubscribe({ channels })),
-    );
+    )),
+);
 
 export const publish = (channel: string, message: unknown) => pipe(
-    T.access(({ [CommunicationURI]: communication }: Communication) => communication),
-    T.chain((communication) => T.fromPromise(() => communication.publish({
-        channel,
-        message,
-    }))),
+    T.accessM(({ [CommunicationURI]: communication }: Communication) =>
+        T.fromPromise(() => communication.publish({
+            channel,
+            message,
+        })),
+    ),
     T.map(CommunicationEvent.of.publishResponse),
 );
 
 export const listen = (channels: string[]) => pipe(
-    S.bracket(() => unsubscribe(channels))(subscribe(channels)),
+    S.bracket(unsubscribe(channels))(subscribe(channels)),
     S.chain(() => S.access(({ [CommunicationURI]: communication }: Communication) => communication)),
     S.chain((communication) => S.effectAsync<{}, never, CommunicationEvent>((cb) => {
         communication.addListener({

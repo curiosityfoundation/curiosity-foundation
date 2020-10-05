@@ -242,6 +242,32 @@
           }
         }
       }
+    },
+    "morphic-redux": {
+      "root": "libs/morphic-redux",
+      "sourceRoot": "libs/morphic-redux/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": [
+              "libs/morphic-redux/tsconfig.lib.json",
+              "libs/morphic-redux/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/morphic-redux/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/morphic-redux/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

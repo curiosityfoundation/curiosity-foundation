@@ -1,59 +1,89 @@
-import { summonFor } from '@morphic-ts/batteries/lib/summoner-BASTJ';
-import * as t from 'io-ts';
+import { summonFor, AsOpaque } from '@morphic-ts/batteries/lib/summoner-ESBST';
+import { AOfMorhpADT, AType, EType } from "@morphic-ts/summoners";
 
 const { summon, tagged } = summonFor<{}>({});
 
-export const MoistureReading = summon((F) =>
+const Reading_ = summon((F) =>
     F.interface(
         {
-            _tag: F.stringLiteral('MoistureReading'),
             value: F.number(),
+            time: F.date(),
+        },
+        'Reading',
+    ),
+);
+export type Reading = AType<typeof Reading_>;
+type ReadingRaw = EType<typeof Reading_>;
+export const Reading = AsOpaque<ReadingRaw, Reading>()(Reading_);
+
+const MoistureReading_ = summon((F) =>
+    F.interface(
+        {
+            type: F.stringLiteral('MoistureReading'),
+            payload: Reading(F),
         },
         'MoistureReading',
     ),
 );
+export type MoistureReading = AType<typeof MoistureReading_>;
+type MoistureReadingRaw = EType<typeof MoistureReading_>;
+export const MoistureReading = AsOpaque<MoistureReadingRaw, MoistureReading>()(MoistureReading_);
 
-export type MoistureReading = t.TypeOf<typeof MoistureReading.type>;
-
-export const LightReading = summon((F) =>
+const LightReading_ = summon((F) =>
     F.interface(
         {
-            _tag: F.stringLiteral('LightReading'),
-            value: F.number(),
+            type: F.stringLiteral('LightReading'),
+            payload: Reading(F),
         },
         'LightReading',
     ),
 );
+export type LightReading = AType<typeof LightReading_>;
+type LightReadingRaw = EType<typeof LightReading_>;
+export const LightReading = AsOpaque<LightReadingRaw, LightReading>()(LightReading_);
 
-export type LightReading = t.TypeOf<typeof LightReading.type>;
-
-export const PumpStarted = summon((F) =>
+const PumpStarted_ = summon((F) =>
     F.interface(
         {
-            _tag: F.stringLiteral('PumpStarted'),
+            type: F.stringLiteral('PumpStarted'),
         },
         'PumpStarted',
     ),
 );
+export type PumpStarted = AType<typeof PumpStarted_>;
+type PumpStartedRaw = EType<typeof PumpStarted_>;
+export const PumpStarted = AsOpaque<PumpStartedRaw, PumpStarted>()(PumpStarted_);
 
-export type PumpStarted = t.TypeOf<typeof PumpStarted.type>;
-
-export const PumpStopped = summon((F) =>
+const PumpStopped_ = summon((F) =>
     F.interface(
         {
-            _tag: F.stringLiteral('PumpStopped'),
+            type: F.stringLiteral('PumpStopped'),
         },
         'PumpStopped',
     ),
 );
+export type PumpStopped = AType<typeof PumpStopped_>;
+type PumpStoppedRaw = EType<typeof PumpStopped_>;
+export const PumpStopped = AsOpaque<PumpStoppedRaw, PumpStopped>()(PumpStopped_);
 
-export type PumpStopped = t.TypeOf<typeof PumpStopped.type>;
+const Failure_ = summon((F) =>
+    F.interface(
+        {
+            type: F.stringLiteral('Failure'),
+        },
+        'Failure'
+    ),
+);
+export type Failure = AType<typeof Failure_>;
+type FailureRaw = EType<typeof Failure_>;
+export const Failure = AsOpaque<FailureRaw, Failure>()(Failure_);
 
-export const DeviceResults = tagged('_tag')({
+export const DeviceResult = tagged('type')({
     MoistureReading,
     LightReading,
     PumpStarted,
     PumpStopped,
+    Failure,
 });
 
-export type DeviceResults = t.TypeOf<typeof DeviceResults.type>;
+export type DeviceResult = AOfMorhpADT<typeof DeviceResult>;
