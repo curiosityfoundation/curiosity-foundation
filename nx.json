@@ -31,6 +31,15 @@
     "web-dashboard-e2e": {
       "tags": [],
       "implicitDependencies": ["web-dashboard"]
+    },
+    "types-messages": {
+      "tags": []
+    },
+    "service-logger": {
+      "tags": []
+    },
+    "service-communication": {
+      "tags": []
     }
   }
 }

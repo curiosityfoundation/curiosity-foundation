@@ -4,9 +4,9 @@ import * as winston from 'winston';
 import * as Pubnub from 'pubnub';
 
 import { app } from './app';
-import { Logger, LoggerURI } from './app/logger';
-import { Communication, CommunicationURI } from './app/communication';
 import { SensorConfig, SensorConfigURI } from './app/sensors';
+import { Logger, LoggerURI } from '@curiosity-foundation/service-logger';
+import { Communication, CommunicationURI } from '@curiosity-foundation/service-communication';
 
 pipe(
     app,

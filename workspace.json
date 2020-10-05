@@ -161,6 +161,87 @@
           }
         }
       }
+    },
+    "types-messages": {
+      "root": "libs/types-messages",
+      "sourceRoot": "libs/types-messages/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": [
+              "libs/types-messages/tsconfig.lib.json",
+              "libs/types-messages/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/types-messages/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/types-messages/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "service-logger": {
+      "root": "libs/service-logger",
+      "sourceRoot": "libs/service-logger/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": [
+              "libs/service-logger/tsconfig.lib.json",
+              "libs/service-logger/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/service-logger/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/service-logger/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "service-communication": {
+      "root": "libs/service-communication",
+      "sourceRoot": "libs/service-communication/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": [
+              "libs/service-communication/tsconfig.lib.json",
+              "libs/service-communication/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/service-communication/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/service-communication/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

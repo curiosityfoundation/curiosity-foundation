@@ -1,10 +1,15 @@
 import * as T from '@effect-ts/core/Effect';
 import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
-import * as Schedule from '@effect-ts/system/Schedule';
-import * as A from 'fp-ts/Array';
 import * as IO from 'fp-ts/IO';
 import * as rpio from 'rpio';
+
+import { 
+    TakeLightReading, 
+    TakeMoistureReading, 
+    DeviceMessage, 
+    DeviceResults,
+} from '@curiosity-foundation/types-messages';
 
 const takeReading = (channel: number): IO.IO<number> => () => {
 
@@ -23,8 +28,8 @@ const takeReading = (channel: number): IO.IO<number> => () => {
 
 };
 
-const acquireGpio = T.effectTotal(rpio.spiBegin);
-const releaseGpio = () => T.effectTotal(rpio.spiEnd);
+const acquireSpi = T.effectTotal(rpio.spiBegin);
+const releaseSpi = () => T.effectTotal(rpio.spiEnd);
 
 export const SensorConfigURI = 'SensorConfigUri';
 export type SensorConfigURI = typeof SensorConfigURI;
@@ -35,15 +40,17 @@ export type SensorConfig = {
     };
 };
 
-export const readFromSensors = pipe(
-    S.bracket(releaseGpio)(acquireGpio),
-    S.chain(() => S.access(({ [SensorConfigURI]: config }: SensorConfig) => config)),
-    S.chain((config) => S.fromSchedule(Schedule.fixed(config.readInterval))),
-    S.chain(() => pipe(
-        [0, 5],
-        A.map(takeReading),
-        A.sequence(IO.io),
-        T.effectTotal,
-        S.fromEffect,
-    )),
-);
+export const handleTakeReadingMessage = (msg: TakeLightReading | TakeMoistureReading) =>
+    pipe(
+        S.bracket(releaseSpi)(acquireSpi),
+        S.chain(() => pipe(
+            DeviceMessage.is.TakeLightReading(msg) ? 0 : 5,
+            takeReading,
+            T.effectTotal,
+            S.fromEffect,
+        )),
+        S.map((value) => DeviceMessage.is.TakeLightReading(msg)
+            ? DeviceResults.of.LightReading({ value })
+            : DeviceResults.of.MoistureReading({ value }),
+        ),
+    );
