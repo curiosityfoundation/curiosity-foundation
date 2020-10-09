@@ -1,15 +1,19 @@
 import * as A from 'fp-ts/Array';
 import { constFalse, constTrue } from 'fp-ts/function';
+import {  AType, EType } from '@morphic-ts/summoners';
 
-import { summon } from '@curiosity-foundation/morphic-redux';
+import { summon, AsOpaque } from '@curiosity-foundation/morphic-redux';
 import { DeviceResult, Reading } from '@curiosity-foundation/types-messages';
 
-export const State = summon((F) => F.interface({
+export const State_ = summon((F) => F.interface({
     moistureReadings: F.array(Reading(F)),
     lightReadings: F.array(Reading(F)),
     pumpRunning: F.boolean(),
     err: F.boolean(),
 }, 'State'));
+export interface State extends AType<typeof State_> {};
+type StateRaw = EType<typeof State_>;
+export const State = AsOpaque<StateRaw, State>()(State_);
 
 export const init = State.build({
     moistureReadings: [],

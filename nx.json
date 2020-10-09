@@ -43,6 +43,12 @@
     },
     "morphic-redux": {
       "tags": []
+    },
+    "effect-ts-epic": {
+      "tags": []
+    },
+    "effect-ts-cycle": {
+      "tags": []
     }
   }
 }

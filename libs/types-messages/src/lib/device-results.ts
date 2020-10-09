@@ -25,7 +25,7 @@ const MoistureReading_ = summon((F) =>
         'MoistureReading',
     ),
 );
-export type MoistureReading = AType<typeof MoistureReading_>;
+export interface MoistureReading extends AType<typeof MoistureReading_> {};
 type MoistureReadingRaw = EType<typeof MoistureReading_>;
 export const MoistureReading = AsOpaque<MoistureReadingRaw, MoistureReading>()(MoistureReading_);
 
@@ -38,7 +38,7 @@ const LightReading_ = summon((F) =>
         'LightReading',
     ),
 );
-export type LightReading = AType<typeof LightReading_>;
+export interface LightReading extends AType<typeof LightReading_> {};
 type LightReadingRaw = EType<typeof LightReading_>;
 export const LightReading = AsOpaque<LightReadingRaw, LightReading>()(LightReading_);
 
@@ -50,7 +50,7 @@ const PumpStarted_ = summon((F) =>
         'PumpStarted',
     ),
 );
-export type PumpStarted = AType<typeof PumpStarted_>;
+export interface PumpStarted extends AType<typeof PumpStarted_> {};
 type PumpStartedRaw = EType<typeof PumpStarted_>;
 export const PumpStarted = AsOpaque<PumpStartedRaw, PumpStarted>()(PumpStarted_);
 
@@ -62,7 +62,8 @@ const PumpStopped_ = summon((F) =>
         'PumpStopped',
     ),
 );
-export type PumpStopped = AType<typeof PumpStopped_>;
+
+export interface PumpStopped extends AType<typeof PumpStopped_> {};
 type PumpStoppedRaw = EType<typeof PumpStopped_>;
 export const PumpStopped = AsOpaque<PumpStoppedRaw, PumpStopped>()(PumpStopped_);
 
@@ -74,9 +75,10 @@ const Failure_ = summon((F) =>
         'Failure'
     ),
 );
-export type Failure = AType<typeof Failure_>;
+export interface Failure extends AType<typeof Failure_> {};
 type FailureRaw = EType<typeof Failure_>;
 export const Failure = AsOpaque<FailureRaw, Failure>()(Failure_);
+
 
 export const DeviceResult = tagged('type')({
     MoistureReading,

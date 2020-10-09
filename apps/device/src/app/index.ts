@@ -7,8 +7,8 @@ import { log, warn } from '@curiosity-foundation/service-logger';
 import { DeviceMessage, DeviceResult } from '@curiosity-foundation/types-messages';
 
 import { runProcess } from './run-process';
-import { handleTakeReadingMessage } from './sensors';
-import { handlePumpMessage } from './pump';
+import { startPump, stopPump } from './io/gpio';
+import { takeReading } from './io/spi';
 import { receiveCommunicatedMessages } from './receive-communicated';
 import { receiveScheduledMessages } from './receive-scheduled';
 import { DeviceConfig, DeviceConfigURI, Env } from './constants';
@@ -46,10 +46,36 @@ const receiveDeviceMessages = S.merge(
     );
 
 const handleDeviceMessage = DeviceMessage.matchStrict({
-    StartPump: handlePumpMessage,
-    StopPump: handlePumpMessage,
-    TakeLightReading: handleTakeReadingMessage,
-    TakeMoistureReading: handleTakeReadingMessage,
+    StartPump: () => pipe(
+        startPump,
+        T.map(() => DeviceResult.of.PumpStarted({})),
+        T.catchAllCause(() => T.succeed(DeviceResult.of.Failure({}))),
+        S.fromEffect,
+    ),
+    StopPump: () => pipe(
+        stopPump,
+        T.map(() => DeviceResult.of.PumpStopped({})),
+        T.catchAllCause(() => T.succeed(DeviceResult.of.Failure({}))),
+        S.fromEffect,
+    ),
+    TakeLightReading: () => pipe(
+        takeReading(0),
+        S.map((value) => DeviceResult.of.LightReading({
+            payload: {
+                value,
+                time: new Date(),
+            },
+        })),
+    ),
+    TakeMoistureReading: () => pipe(
+        takeReading(5),
+        S.map((value) => DeviceResult.of.MoistureReading({
+            payload: {
+                value,
+                time: new Date(),
+            },
+        })),
+    ),
 });
 
 const handleDeviceResult = DeviceResult.matchStrict({

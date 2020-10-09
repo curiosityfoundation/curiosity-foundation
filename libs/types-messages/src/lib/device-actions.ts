@@ -1,5 +1,5 @@
 import { summonFor, AsOpaque } from '@morphic-ts/batteries/lib/summoner-ESBST';
-import { AOfMorhpADT, AType, EType } from "@morphic-ts/summoners";
+import { AOfMorhpADT, AType, EType } from '@morphic-ts/summoners';
 
 const { summon, tagged } = summonFor<{}>({});
 
