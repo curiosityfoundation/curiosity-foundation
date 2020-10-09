@@ -269,32 +269,6 @@
         }
       }
     },
-    "effect-ts-epic": {
-      "root": "libs/effect-ts-epic",
-      "sourceRoot": "libs/effect-ts-epic/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:lint",
-          "options": {
-            "linter": "eslint",
-            "tsConfig": [
-              "libs/effect-ts-epic/tsconfig.lib.json",
-              "libs/effect-ts-epic/tsconfig.spec.json"
-            ],
-            "exclude": ["**/node_modules/**", "!libs/effect-ts-epic/**/*"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/effect-ts-epic/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
     "effect-ts-cycle": {
       "root": "libs/effect-ts-cycle",
       "sourceRoot": "libs/effect-ts-cycle/src",

@@ -16,9 +16,9 @@ export const logPumpStarted = cycle<State, PumpStarted>()(
                 T.effectTotal(() => {
                     console.log(a);
                 }),
+                T.andThen(log('test')),
                 T.andThen(T.succeed(a)),
-            )),
-            S.mapConcat(() => []),
+            ))
         ),
 );
 
@@ -33,7 +33,7 @@ export const logMoistureReadings = cycle<State, DeviceResult>()(
     (action$) =>
         pipe(
             action$,
-            S.mapM(logTap),
-            S.mapConcat(() => []),
+            S.mapM(logTap)
+            S.mapConcat(() => [])
         ),
 );
