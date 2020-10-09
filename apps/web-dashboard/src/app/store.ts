@@ -14,12 +14,12 @@ import { logPumpStarted, logMoistureReadings } from './epics';
 
 export const createStore: IO.IO<Store> = () => {
 
-    const provideTest = T.provide({});
-
     const cycleMiddleware = RC.createCycleMiddleware();
     const { makeActionDriver, makeStateDriver } = cycleMiddleware;
 
-    const rootCycle = embed(logMoistureReadings, logPumpStarted)(provideTest);
+    const withEnv = T.provide({});
+
+    const rootCycle = embed(logPumpStarted)(withEnv);
 
     new Pubnub({
         publishKey: 'pub-c-bf6ce03f-92f7-4a20-862c-56a275282e2c',

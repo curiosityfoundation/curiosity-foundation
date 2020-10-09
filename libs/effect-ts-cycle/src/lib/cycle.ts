@@ -5,7 +5,6 @@ import * as Ex from '@effect-ts/core/Effect/Exit'
 import * as C from '@effect-ts/core/Effect/Cause'
 import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function'
-import { create as createMost } from '@most/create';
 import * as M from 'most';
 import { Action } from 'redux';
 import * as RC from 'redux-cycles';
@@ -20,7 +19,7 @@ type ReduxSinks<O extends Action> = {
     ACTION: M.Stream<O>;
 };
 
-export interface Cycle<R, State, A extends Action, O extends A> {
+export interface Cycle<R, State, A extends Action = Action, O extends A = A> {
     _A: A
     _O: O
     _R: R
@@ -30,10 +29,10 @@ export interface Cycle<R, State, A extends Action, O extends A> {
 
 type AnyCycle = Cycle<any, any, any, any> | Cycle<any, any, any, never>;
 
-type Env<K extends AnyCycle> = K["_R"];
-type Sta<K extends AnyCycle> = K["_S"];
-type Act<K extends AnyCycle> = K["_A"];
-type AOut<K extends AnyCycle> = K["_O"];
+type Env<K extends AnyCycle> = K['_R'];
+type Sta<K extends AnyCycle> = K['_S'];
+type Act<K extends AnyCycle> = K['_A'];
+type AOut<K extends AnyCycle> = K['_O'];
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
     k: infer I
@@ -41,29 +40,29 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
     ? I
     : never;
 
-type CyclesEnvType<CS extends AnyCycle> = UnionToIntersection<
-    Env<Exclude<CS, Cycle<unknown, any, any, any>>>
+type CyclesEnvType<CS extends A.NonEmptyArray<AnyCycle>> = UnionToIntersection<
+    Env<CS[number]>
 >;
 
 export type RCMain<State, A extends Action, O extends A> = RC.Main<ReduxSources<State, A>, ReduxSinks<O>>;
 
 function toNever(_: any): never {
-    return undefined as never
-}
+    return undefined as never;
+};
 
 export function embed<CS extends A.NonEmptyArray<AnyCycle>>(
     ...cycles: CS
 ): (
         provider: (
-            _: T.Effect<CyclesEnvType<typeof cycles[number]>, never, unknown>
-        ) => T.Effect<any, never, unknown>
+            _: T.Effect<CyclesEnvType<CS>, never, unknown>
+        ) => T.Effect<T.DefaultEnv, never, unknown>
     ) => RCMain<Sta<CS[number]>, Act<CS[number]>, AOut<CS[number]>> {
 
     type CSType = CS[number];
     type Action = Act<CSType>;
     type State = Sta<CSType>;
     type ActionOut = AOut<CSType>;
-    type REnv = CyclesEnvType<CSType>;
+    type REnv = CyclesEnvType<CS>;
 
     // cannot convince typechecker that array is nonempty
     return (provider) => (RC.combineCycles as any)(
@@ -87,7 +86,7 @@ export function embed<CS extends A.NonEmptyArray<AnyCycle>>(
         )
     );
 
-}
+};
 
 export function cycle<State, A extends Action>(): <R, O extends A>(
     e: (action$: S.UIO<A>, state$: S.UIO<State>) => S.RIO<R, O>

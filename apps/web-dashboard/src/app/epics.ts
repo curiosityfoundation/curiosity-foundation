@@ -16,7 +16,6 @@ export const logPumpStarted = cycle<State, PumpStarted>()(
                 T.effectTotal(() => {
                     console.log(a);
                 }),
-                T.andThen(log('test')),
                 T.andThen(T.succeed(a)),
             ))
         ),
@@ -26,6 +25,7 @@ const logTap = <A>(a: A) => pipe(
     T.effectTotal(() => {
         console.log(a);
     }),
+    T.andThen(log('test')),
     T.andThen(T.succeed(a)),
 );
 
@@ -33,7 +33,7 @@ export const logMoistureReadings = cycle<State, DeviceResult>()(
     (action$) =>
         pipe(
             action$,
-            S.mapM(logTap)
+            S.mapM(logTap),
             S.mapConcat(() => [])
         ),
 );

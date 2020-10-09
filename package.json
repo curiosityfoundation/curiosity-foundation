@@ -45,6 +45,7 @@
     "@effect-ts/core": "^0.3.4",
     "@effect-ts/system": "^0.1.2",
     "@morphic-ts/batteries": "^2.0.0-alpha.13",
+    "@most/create": "^2.0.1",
     "@reduxjs/toolkit": "^1.4.0",
     "document-register-element": "1.13.1",
     "fast-check": "^2.4.0",
