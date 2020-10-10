@@ -46,6 +46,13 @@
     },
     "effect-ts-cycle": {
       "tags": []
+    },
+    "admin-dashboard": {
+      "tags": []
+    },
+    "admin-dashboard-e2e": {
+      "tags": [],
+      "implicitDependencies": ["admin-dashboard"]
     }
   }
 }
