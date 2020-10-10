@@ -40,10 +40,10 @@ const logAndPublish = (msg: string) => (res: DeviceResult) => pipe(
     S.fromEffect,
 );
 
-const receiveDeviceMessages = S.merge(
-    S.unwrap<unknown, Env, DeviceMessage>(receiveScheduledMessages))(
-        S.unwrap<unknown, Env, DeviceMessage>(receiveCommunicatedMessages),
-    );
+const receiveDeviceMessages = pipe(
+    S.unwrap<unknown, Env, DeviceMessage>(receiveScheduledMessages),
+    S.merge(S.unwrap<unknown, Env, DeviceMessage>(receiveCommunicatedMessages as any)),
+);
 
 const handleDeviceMessage = DeviceMessage.matchStrict({
     StartPump: () => pipe(

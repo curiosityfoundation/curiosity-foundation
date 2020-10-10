@@ -1,9 +1,11 @@
 import * as A from 'fp-ts/Array';
 import { constFalse, constTrue } from 'fp-ts/function';
-import {  AType, EType } from '@morphic-ts/summoners';
+import { AOfMorhpADT, AType, EType } from "@morphic-ts/summoners";
 
-import { summon, AsOpaque } from '@curiosity-foundation/morphic-redux';
+import { summon, AsOpaque, tagged } from '@curiosity-foundation/morphic-redux';
 import { DeviceResult, Reading } from '@curiosity-foundation/types-messages';
+import { CommunicationAction } from '@curiosity-foundation/service-communication';
+import { restyle } from 'plotly.js';
 
 export const State_ = summon((F) => F.interface({
     moistureReadings: F.array(Reading(F)),
@@ -11,7 +13,7 @@ export const State_ = summon((F) => F.interface({
     pumpRunning: F.boolean(),
     err: F.boolean(),
 }, 'State'));
-export interface State extends AType<typeof State_> {};
+export interface State extends AType<typeof State_> { };
 type StateRaw = EType<typeof State_>;
 export const State = AsOpaque<StateRaw, State>()(State_);
 
@@ -22,8 +24,15 @@ export const init = State.build({
     err: false,
 });
 
+const MAX_READINGS = 50;
+
 const monoidReadingArr = A.getMonoid<Reading>();
-const append = (r: Reading) => (rs: Reading[]) => monoidReadingArr.concat(rs, [r]);
+const append = (r: Reading) => ([h, ...rs]: Reading[]) =>
+    !h
+        ? [r]
+        : rs.length >= MAX_READINGS
+            ? [...rs, r]
+            : [h, ...rs, r];
 
 export const reducer = DeviceResult.createReducer(init)({
     PumpStarted: () => State.lensFromProp('pumpRunning').modify(constTrue),

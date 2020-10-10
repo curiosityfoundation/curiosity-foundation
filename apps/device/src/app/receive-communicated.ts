@@ -15,10 +15,10 @@ export const receiveCommunicatedMessages = pipe(
         log(`listening for messages on channel ${config.readChannel}`),
         T.andThen(pipe(
             listen([config.readChannel]),
-            S.chain((ev) => S.fromEffect(pipe(
+            S.mapM((ev) => pipe(
                 verbose(`${ev._tag} communication event received`),
                 T.andThen(T.succeed(ev)),
-            ))),
+            )),
             S.mapConcat(CommunicationEvent.matchStrict<DeviceMessage[]>({
                 publishResponse: () => [],
                 presence: () => [],
@@ -31,6 +31,7 @@ export const receiveCommunicatedMessages = pipe(
                         (msg) => [msg],
                     ),
                 ),
+                historyMessage: () => [],
             })),
             S.chain((msg) => S.fromEffect(pipe(
                 verbose(`${msg.type} message decoded`),
