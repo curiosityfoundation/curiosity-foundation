@@ -30,6 +30,9 @@
       ],
       "@curiosity-foundation/effect-ts-cycle": [
         "libs/effect-ts-cycle/src/index.ts"
+      ],
+      "@curiosity-foundation/feature-licenses": [
+        "libs/feature-licenses/src/index.ts"
       ]
     }
   },

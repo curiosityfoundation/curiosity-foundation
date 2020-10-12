@@ -53,6 +53,9 @@
     "admin-dashboard-e2e": {
       "tags": [],
       "implicitDependencies": ["admin-dashboard"]
+    },
+    "feature-licenses": {
+      "tags": []
     }
   }
 }
