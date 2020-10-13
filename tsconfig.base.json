@@ -33,7 +33,8 @@
       ],
       "@curiosity-foundation/feature-licenses": [
         "libs/feature-licenses/src/index.ts"
-      ]
+      ],
+      "@curiosity-foundation/feature-auth": ["libs/feature-auth/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -56,6 +56,9 @@
     },
     "feature-licenses": {
       "tags": []
+    },
+    "feature-auth": {
+      "tags": []
     }
   }
 }

@@ -417,6 +417,29 @@
           }
         }
       }
+    },
+    "feature-auth": {
+      "root": "libs/feature-auth",
+      "sourceRoot": "libs/feature-auth/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/feature-auth/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/feature-auth/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-auth/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

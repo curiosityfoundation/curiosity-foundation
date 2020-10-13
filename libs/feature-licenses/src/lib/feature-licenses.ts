@@ -1,34 +1,23 @@
-import { summonFor, AsOpaque } from '@morphic-ts/batteries/lib/summoner-ESBST';
-import { AOfMorhpADT, AType, EType } from '@morphic-ts/summoners';
+import * as M from '@effect-ts/morphic'
 
-const { summon, tagged } = summonFor<{}>({});
+const UnclaimedLicense_ = M.make((F) => F.interface({
+    id: F.string(),
+    deviceId: F.string(),
+    created: F.date(),
+}, { name: 'UnclaimedLicense' }));
 
-const UnclaimedLicense_ = summon((F) =>
-    F.interface(
-        {
-            id: F.string(),
-            deviceId: F.string(),
-            created: F.date(),
-        },
-        'UnclaimedLicense'
-    ),
-);
-export interface UnclaimedLicense extends AType<typeof UnclaimedLicense_> { };
-type UnclaimedLicenseRaw = EType<typeof UnclaimedLicense_>;
-export const UnclaimedLicense = AsOpaque<UnclaimedLicenseRaw, UnclaimedLicense>()(UnclaimedLicense_);
+export interface UnclaimedLicense extends M.AType<typeof UnclaimedLicense_> { }
+export interface UnclaimedLicenseRaw extends M.EType<typeof UnclaimedLicense_> { }
+export const UnclaimedLicense = M.opaque<UnclaimedLicenseRaw, UnclaimedLicense>()(UnclaimedLicense_);
 
-const ClaimedLicense_ = summon((F) =>
-    F.interface(
-        {
-            id: F.string(),
-            deviceId: F.string(),
-            claimedBy: F.string(),
-            claimed: F.date(),
-            created: F.date(),
-        },
-        'ClaimedLicense'
-    ),
-);
-export interface ClaimedLicense extends AType<typeof ClaimedLicense_> { };
-type ClaimedLicenseRaw = EType<typeof ClaimedLicense_>;
-export const ClaimedLicense = AsOpaque<ClaimedLicenseRaw, ClaimedLicense>()(ClaimedLicense_);
+const ClaimedLicense_ = M.make((F) => F.interface({
+    id: F.string(),
+    deviceId: F.string(),
+    claimedBy: F.string(),
+    claimed: F.date(),
+    created: F.date(),
+}, { name: 'ClaimedLicense' }));
+
+export interface ClaimedLicense extends M.AType<typeof ClaimedLicense_> { }
+export interface ClaimedLicenseRaw extends M.EType<typeof ClaimedLicense_> { }
+export const ClaimedLicense = M.opaque<ClaimedLicenseRaw, ClaimedLicense>()(ClaimedLicense_);
