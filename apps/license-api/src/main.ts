@@ -1,9 +1,8 @@
 import * as T from '@effect-ts/core/Effect';
-import * as O from '@effect-ts/core/Classic/Option';
 import * as L from '@effect-ts/core/Effect/Layer';
-import * as Schedule from '@effect-ts/core/Effect/Schedule';
 import { pipe } from '@effect-ts/core/Function';
 import * as express from 'express';
+import { MongoClient } from 'mongodb';
 import * as jwt from 'express-jwt';
 import * as jwtAuthz from 'express-jwt-authz';
 import * as jwksRsa from 'jwks-rsa';
@@ -69,6 +68,11 @@ const waitProcessExit =
             })
         }))()
 
+const mongo = new MongoClient(
+    String(MONGO_CONNECTION_STRING),
+    { useUnifiedTopology: true },
+);
+
 pipe(
     Server.useMiddlewares([
         cors(),
@@ -81,6 +85,6 @@ pipe(
     T.provideSomeLayer(Router),
     T.provideSomeLayer(Licenses.LicensePersistenceLive),
     T.provideSomeLayer(Server.ExpressServerLive(Number(PORT))),
-    T.provideSomeLayer(DB.MongoClientLive(String(MONGO_CONNECTION_STRING))),
+    T.provideSomeLayer(DB.MongoClientLive(mongo)),
     T.runMain,
 );

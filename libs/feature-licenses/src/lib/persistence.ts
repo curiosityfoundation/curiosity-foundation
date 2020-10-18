@@ -4,7 +4,7 @@ import * as O from '@effect-ts/core/Classic/Option';
 import * as T from '@effect-ts/core/Effect';
 import * as L from '@effect-ts/core/Effect/Layer';
 import { pipe } from '@effect-ts/core/Function';
-import { ObjectId } from 'mongodb';
+import { nanoid } from 'nanoid';
 
 import { accessMongoClientM } from '@curiosity-foundation/feature-db';
 
@@ -21,7 +21,7 @@ const makeLicensePersistence = () => ({
         T.do,
         T.bind('doc', () => encodeUnclaimedLicense({
             deviceId,
-            _id: new ObjectId().toHexString(),
+            _id: nanoid(),
             created: new Date(),
             modified: O.none,
         })),
@@ -58,7 +58,7 @@ const makeLicensePersistence = () => ({
         T.bind('doc', () => encodeClaimedLicense({
             claimedBy,
             deviceId,
-            _id: new ObjectId().toHexString(),
+            _id: nanoid(),
             created: new Date(),
             modified: O.none,
         })),
