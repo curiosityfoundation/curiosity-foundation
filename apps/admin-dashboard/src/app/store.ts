@@ -9,13 +9,18 @@ import { LoggerURI } from '@curiosity-foundation/service-logger';
 import { embed } from '@curiosity-foundation/effect-ts-cycle';
 import {
     authReducer,
-    loginCycle,
-    logoutCycle,
-    AuthURI,
+    loginWithSPACycle,
+    logoutWithSPACycle,
+    getAccessTokenWithSPA,
+    SPAAuthURI,
     AuthConfigURI,
 } from '@curiosity-foundation/feature-auth';
+import {
+    unclaimedLicensesReducer,
+} from '@curiosity-foundation/feature-licenses';
 
-import { Env } from './constants';
+import { getTokenAndProfileAfterLoggingIn, fetchUnclaimedLicenses } from './cycles';
+import { AppConfigURI, Env } from './constants';
 
 export const createStore: IO.IO<Store> = () => {
 
@@ -28,25 +33,35 @@ export const createStore: IO.IO<Store> = () => {
             warn: console.warn,
             verbose: console.log,
         },
-        [AuthURI]: new Auth0Client({
+        [SPAAuthURI]: new Auth0Client({
             domain: String(process.env.NX_AUTH0_DOMAIN),
             client_id: String(process.env.NX_AUTH0_CLIENT_ID),
-            redirect_uri: window.location.origin,
         }),
         [AuthConfigURI]: {
             domain: String(process.env.NX_AUTH0_DOMAIN),
             clientId: String(process.env.NX_AUTH0_CLIENT_ID),
             redirectURI: window.location.origin,
+            responseType: 'token id_token',
+            scope: 'openid profile write:licenses read:licenses',
+            callbackURL: 'http://localhost:4200/callback',
+            audience: String(process.env.NX_AUTH0_AUDIENCE),
         },
+        [AppConfigURI]: {
+            apiURL: 'http://localhost:8080',
+        }
     });
-
+    
     const rootCycle = embed(
-        logoutCycle,
-        loginCycle,
+        loginWithSPACycle,
+        logoutWithSPACycle,
+        getAccessTokenWithSPA,
+        getTokenAndProfileAfterLoggingIn,
+        fetchUnclaimedLicenses,
     )(withEnv);
 
     const reducer = combineReducers({
         auth: authReducer,
+        unclaimedLicenses: unclaimedLicensesReducer,
     });
 
     const store = configureStore({

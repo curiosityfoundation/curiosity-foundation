@@ -1,48 +1,15 @@
-import { ProgramType } from '@morphic-ts/summoners';
-import { ProgramNoUnionURI } from '@morphic-ts/batteries/lib/program-no-union';
+import * as M from '@effect-ts/morphic';
 
-import { summon, M, AppEnv } from './summoner';
+export const makeAction = <T extends string>(type: T) =>
+    M.make((F) => F.interface({
+        type: F.stringLiteral(type),
+    }, { name: type }));
 
-export type MyProgram<E, A> = ProgramType<AppEnv, E, A>[ProgramNoUnionURI];
-
-export interface TagTypeIs<Type> {
-    type: Type;
-}
-
-export const Action = <T extends string, E, P>(
+export const makePayloadAction = <T extends string, P extends object = {}, O extends object = {}>(
     type: T,
-    payload: MyProgram<E, P & { type?: never }>
-): M<E & TagTypeIs<string>, P & TagTypeIs<T>> =>
-    summon<E & TagTypeIs<string>, P & TagTypeIs<T>>((F) =>
-        F.intersection(
-            [
-                F.interface(
-                    {
-                        type: F.stringLiteral(type),
-                    },
-                    `Tag '${type as string}'`
-                ),
-                payload(F),
-            ],
-            type,
-        )
-    );
-
-export const State = <T extends string, E, P>(
-    type: T,
-    data: MyProgram<E, P & { type?: never }>
-): M<E & TagTypeIs<string>, P & TagTypeIs<T>> =>
-    summon<E & TagTypeIs<string>, P & TagTypeIs<T>>((F) =>
-        F.intersection(
-            [
-                F.interface(
-                    {
-                        type: F.stringLiteral(type),
-                    },
-                    `Tag '${type as string}'`
-                ),
-                data(F),
-            ],
-            type,
-        )
-    );
+    payload: M.M<any, Readonly<P>, Readonly<O>>,
+) =>
+    M.make((F) => F.interface({
+        type: F.stringLiteral(type),
+        payload: payload(F),
+    }, { name: type }));

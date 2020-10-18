@@ -62,6 +62,37 @@ export interface LogoutFailure extends M.AType<typeof LogoutFailure_> { }
 export interface LogoutFailureRaw extends M.EType<typeof LogoutFailure_> { }
 export const LogoutFailure = M.opaque<LogoutFailureRaw, LogoutFailure>()(LogoutFailure_);
 
+// Access Token
+
+const GetAccessToken_ = M.make((F) => F.interface({
+    type: F.stringLiteral('GetAccessToken'),
+}, { name: 'GetAccessToken' }));
+
+export interface GetAccessToken extends M.AType<typeof GetAccessToken_> { }
+export interface GetAccessTokenRaw extends M.EType<typeof GetAccessToken_> { }
+export const GetAccessToken = M.opaque<GetAccessTokenRaw, GetAccessToken>()(GetAccessToken_);
+
+const AccessTokenSuccess_ = M.make((F) => F.interface({
+    type: F.stringLiteral('AccessTokenSuccess'),
+    payload: F.string(),
+}, { name: 'AccessTokenSuccess' }));
+
+export interface AccessTokenSuccess extends M.AType<typeof AccessTokenSuccess_> { }
+export interface AccessTokenSuccessRaw extends M.EType<typeof AccessTokenSuccess_> { }
+export const AccessTokenSuccess = M.opaque<AccessTokenSuccessRaw, AccessTokenSuccess>()(AccessTokenSuccess_);
+
+const AccessTokenFailure_ = M.make((F) => F.interface({
+    type: F.stringLiteral('AccessTokenFailure'),
+    payload: F.interface({
+        name: F.string(),
+        message: F.string(),
+    }),
+}, { name: 'AccessTokenFailure' }));
+
+export interface AccessTokenFailure extends M.AType<typeof AccessTokenFailure_> { }
+export interface AccessTokenFailureRaw extends M.EType<typeof AccessTokenFailure_> { }
+export const AccessTokenFailure = M.opaque<AccessTokenFailureRaw, AccessTokenFailure>()(AccessTokenFailure_);
+
 export const AuthAction = M.makeADT('type')({
     StartLogin,
     LoginFailure,
@@ -69,6 +100,9 @@ export const AuthAction = M.makeADT('type')({
     StartLogout,
     LogoutFailure,
     LogoutSuccess,
+    GetAccessToken,
+    AccessTokenSuccess,
+    AccessTokenFailure,
 });
 
 export type AuthAction = M.AType<typeof AuthAction>;

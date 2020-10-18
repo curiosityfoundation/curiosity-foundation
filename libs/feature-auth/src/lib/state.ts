@@ -5,6 +5,7 @@ const LoggedIn_ = M.make((F) => F.interface({
     type: F.stringLiteral('LoggedIn'),
     error: F.optional(F.string()),
     user: User(F),
+    accessToken: F.optional(F.string()),
 }, { name: 'LoggedIn' }));
 
 export interface LoggedIn extends M.AType<typeof LoggedIn_> { }
@@ -23,6 +24,7 @@ export const LoggedOut = M.opaque<LoggedOutRaw, LoggedOut>()(LoggedOut_);
 const LoggingOut_ = M.make((F) => F.interface({
     type: F.stringLiteral('LoggingOut'),
     user: User(F),
+    accessToken: F.optional(F.string()),
 }, { name: 'LoggingOut' }));
 
 export interface LoggingOut extends M.AType<typeof LoggingOut_> { }

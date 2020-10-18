@@ -59,6 +59,18 @@
     },
     "feature-auth": {
       "tags": []
+    },
+    "license-api": {
+      "tags": []
+    },
+    "util-types": {
+      "tags": []
+    },
+    "feature-db": {
+      "tags": []
+    },
+    "feature-http-server": {
+      "tags": []
     }
   }
 }

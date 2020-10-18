@@ -34,7 +34,12 @@
       "@curiosity-foundation/feature-licenses": [
         "libs/feature-licenses/src/index.ts"
       ],
-      "@curiosity-foundation/feature-auth": ["libs/feature-auth/src/index.ts"]
+      "@curiosity-foundation/feature-auth": ["libs/feature-auth/src/index.ts"],
+      "@curiosity-foundation/util-types": ["libs/util-types/src/index.ts"],
+      "@curiosity-foundation/feature-db": ["libs/feature-db/src/index.ts"],
+      "@curiosity-foundation/feature-http-server": [
+        "libs/feature-http-server/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]
