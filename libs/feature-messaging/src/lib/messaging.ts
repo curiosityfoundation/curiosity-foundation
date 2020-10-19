@@ -1,51 +1,43 @@
-import { has } from '@effect-ts/core/Classic/Has';
 import * as O from '@effect-ts/core/Classic/Option';
 import * as T from '@effect-ts/core/Effect';
-import * as L from '@effect-ts/core/Effect/Layer';
 import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
-import type { HistoryMessage } from 'pubnub';
+import type { HistoryResponse } from 'pubnub';
 
 import { verbose } from '@curiosity-foundation/feature-logging';
+import { DeviceAction, ResultAction } from '@curiosity-foundation/feature-device-io';
 
 import { accessPubnubClient, accessPubnubClientM } from './client';
 import { MessagingEvent } from './model';
 
-const makeMessaging = () => ({
-    subscribe: (channels: string[]) => pipe(
-        verbose(`subscribing to channels ${channels}`),
-        T.andThen(accessPubnubClientM(({ client }) =>
-            T.effectTotal(() => client.subscribe({ channels })),
+export const subscribe = (channels: string[]) => pipe(
+    verbose(`subscribing to channels ${channels}`),
+    T.andThen(accessPubnubClientM(({ client }) =>
+        T.effectTotal(() => client.subscribe({ channels })),
+    )),
+);
+
+export const unsubscribe = (channels: string[]) => pipe(
+    verbose(`unsubscribing to channels ${channels}`),
+    T.andThen(accessPubnubClientM(({ client }) =>
+        T.effectTotal(() => client.unsubscribe({ channels })),
+    )),
+);
+
+export const publish = (channel: string, message: DeviceAction | ResultAction) =>
+    pipe(
+        verbose(`publishing ${message.type} to ${channel}`),
+        T.andThen(pipe(
+            accessPubnubClientM(({ client }) =>
+                T.fromPromise(() => client.publish({
+                    channel,
+                    message,
+                })),
+            ),
+            T.tap((response) =>
+                verbose(`published ${message.type} to ${channel} at ${response.timetoken}`)),
         )),
-    ),
-    unsubscribe: (channels: string[]) => pipe(
-        verbose(`unsubscribing to channels ${channels}`),
-        T.andThen(accessPubnubClientM(({ client }) =>
-            T.effectTotal(() => client.unsubscribe({ channels })),
-        )),
-    ),
-    publish: (channel: string, message: unknown) => pipe(
-        accessPubnubClientM(({ client }) =>
-            T.fromPromise(() => client.publish({
-                channel,
-                message,
-            })),
-        ),
-    ),
-});
-
-export interface Messaging
-    extends ReturnType<typeof makeMessaging> { }
-
-export const Messaging = has<Messaging>()
-
-export const MessagingLive = L.fromConstructor(Messaging)(
-    makeMessaging,
-)()
-
-export const { subscribe, unsubscribe, publish } = T.deriveLifted(
-    Messaging
-)(['subscribe', 'unsubscribe', 'publish'], [] as never[], [] as never[]);
+    );
 
 export const listen = (channels: string[]) => pipe(
     S.bracket(() => unsubscribe(channels))(subscribe(channels)),
@@ -57,17 +49,21 @@ export const listen = (channels: string[]) => pipe(
             presence: (ev) => cb(T.succeed([MessagingEvent.of.presence({ state: null, ...ev })])),
         });
     })),
+    S.mapM((event) => pipe(
+        verbose(`${event._tag} event received from ${channels}`),
+        T.andThen(T.succeed(event)),
+    )),
 );
 
 export const getHistory = (channel: string, count: number) => pipe(
     S.fromEffect(accessPubnubClient(({ client }) => client)),
-    S.chain((client) => S.effectAsync<{}, unknown, HistoryMessage>((cb) => {
+    S.chain((client) => S.effectAsync<{}, unknown, HistoryResponse>((cb) => {
         client.history({
             channel,
             count,
         }).then(
             (response) => {
-                cb(T.succeed(response.messages));
+                cb(T.succeed([response]));
                 cb(T.fail(O.none));
             },
             (err) => {
@@ -76,5 +72,9 @@ export const getHistory = (channel: string, count: number) => pipe(
             },
         );
     })),
+    S.mapConcatM((response) => pipe(
+        verbose(`${response.messages.length} of the ${count} requested history messages were received from ${channel}`),
+        T.andThen(T.succeed(response.messages)),
+    )),
     S.map(MessagingEvent.of.historyMessage),
 );

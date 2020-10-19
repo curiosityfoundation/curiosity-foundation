@@ -5,7 +5,7 @@ import { configureStore, Store, combineReducers } from '@reduxjs/toolkit';
 import * as IO from 'fp-ts/IO';
 import * as RC from 'redux-cycles'
 
-import { LoggerURI } from '@curiosity-foundation/service-logger';
+import { LoggerLive } from '@curiosity-foundation/feature-logging';
 import { embed } from '@curiosity-foundation/effect-ts-cycle';
 import {
     authReducer,

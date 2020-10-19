@@ -21,7 +21,7 @@ type ReduxSinks<O extends Action> = {
 
 export type RCMain<State, A extends Action, O extends A> = RC.Main<ReduxSources<State, A>, ReduxSinks<O>>;
 
-export interface Cycle<R, State, A extends Action = Action, O extends A = A> {
+export interface Cycle<R, State, A extends Action = Action, O extends Action = A> {
     _A: A
     _O: O
     _R: R
@@ -88,7 +88,7 @@ export function embed<CS extends A.NonEmptyArray<AnyCycle>>(
 
 };
 
-export function cycle<State, A extends Action>(): <R, O extends A>(
+export function cycle<State, A extends Action, O extends Action = A>(): <R>(
     e: (action$: S.UIO<A>, state$: S.UIO<State>) => S.Stream<R, unknown, O>
 ) => Cycle<R, State, A, O> {
     return (e) => e as any

@@ -7,7 +7,6 @@ import { summonFor, AsOpaque } from '@morphic-ts/batteries/lib/summoner-ESBST';
 import { AOfMorhpADT, AType, EType } from "@morphic-ts/summoners";
 
 import { ADTType, ofType, makeADT } from '@morphic-ts/adt';
-import { verbose } from '@curiosity-foundation/service-logger';
 import type * as Pubnub from 'pubnub';
 
 const { summon, tagged } = summonFor<{}>({});

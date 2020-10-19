@@ -3,7 +3,7 @@ import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
 
 import { cycle } from '@curiosity-foundation/effect-ts-cycle';
-import { log } from '@curiosity-foundation/service-logger';
+import { info } from '@curiosity-foundation/feature-logging';
 
 import { AuthAction } from './action';
 import {
@@ -23,7 +23,7 @@ export const loginWithSPACycle = cycle<any, AuthAction>()(
                     [AuthConfigURI]: config
                 }: SPAAuth & AuthConfig) => ({ auth, config })),
                 S.mapM(({ auth, config }) => pipe(
-                    log('logging in'),
+                    info('logging in'),
                     T.andThen(T.fromPromise(
                         () => auth.loginWithPopup({
                             redirect_uri: config.redirectURI,
@@ -33,14 +33,14 @@ export const loginWithSPACycle = cycle<any, AuthAction>()(
                         }),
                     )),
                     T.andThen(pipe(
-                        log(`getting profile`),
+                        info(`getting profile`),
                         T.andThen(pipe(
                             T.fromPromise(() => auth.getUser({})),
                             T.map((user) => AuthAction.of.LoginSuccess({ payload: user }))
                         )),
                     )),
                     T.catchAll(({ message, name }: Error) => pipe(
-                        log(`login failed: ${message}`),
+                        info(`login failed: ${message}`),
                         T.andThen(T.succeed(AuthAction.of.LoginFailure({
                             payload: { message, name },
                         }))),
@@ -62,7 +62,7 @@ export const logoutWithSPACycle = cycle<any, AuthAction>()(
                     T.effectTotal(() => auth.logout({})),
                     T.map(() => AuthAction.of.LogoutSuccess({})),
                     T.catchAll(({ message, name }: Error) => pipe(
-                        log(`logout failed: ${message}`),
+                        info(`logout failed: ${message}`),
                         T.andThen(T.succeed(AuthAction.of.LogoutFailure({
                             payload: { message, name },
                         }))),
@@ -84,7 +84,7 @@ export const getAccessTokenWithSPA = cycle<any, AuthAction>()(
                     [AuthConfigURI]: config
                 }: SPAAuth & AuthConfig) => ({ auth, config })),
                 S.mapM(({ auth, config }) => pipe(
-                    log('getting token'),
+                    info('getting token'),
                     T.andThen(T.fromPromise(() => auth.getTokenSilently({
                         redirect_uri: config.redirectURI,
                         clientID: config.clientId,
@@ -104,11 +104,11 @@ export const getAccessTokenWithSPA = cycle<any, AuthAction>()(
                         scope: config.scope,
                     }))),
                     T.chain((token) => pipe(
-                        log(`token received`),
+                        info(`token received`),
                         T.andThen(T.succeed(AuthAction.of.AccessTokenSuccess({ payload: token }))),
                     )),
                     T.catchAll(({ message, name }: Error) => pipe(
-                        log(`login failed: ${message}`),
+                        info(`login failed: ${message}`),
                         T.andThen(T.succeed(AuthAction.of.AccessTokenFailure({
                             payload: { message, name },
                         }))),

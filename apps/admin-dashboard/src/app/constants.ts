@@ -1,4 +1,4 @@
-import { Logger } from '@curiosity-foundation/service-logger';
+import { Logger } from '@curiosity-foundation/feature-logging';
 import { SPAAuth, AuthConfig, AuthState } from '@curiosity-foundation/feature-auth';
 import { UnclaimedLicensesState } from '@curiosity-foundation/feature-licenses';
 

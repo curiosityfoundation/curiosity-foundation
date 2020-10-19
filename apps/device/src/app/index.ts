@@ -2,39 +2,18 @@ import * as T from '@effect-ts/core/Effect';
 import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
 
-import { publish } from '@curiosity-foundation/service-communication';
-import { info, warn } from '@curiosity-foundation/feature-logging';
-import { DeviceMessage, DeviceResult } from '@curiosity-foundation/types-messages';
+import { publish } from '@curiosity-foundation/feature-messaging';
+import { info } from '@curiosity-foundation/feature-logging';
+import { DeviceAction, ResultAction } from '@curiosity-foundation/feature-device-io';
+import { readSPI, writePin } from '@curiosity-foundation/feature-device-io';
 
-import { runProcess } from './run-process';
-import { startPump, stopPump } from './io/gpio';
-import { takeReading } from './io/spi';
-import { receiveCommunicatedMessages } from './receive-communicated';
-import { receiveScheduledMessages } from './receive-scheduled';
-import { DeviceConfig, DeviceConfigURI, Env } from './constants';
+import { checkWifiAndConnectIfNotConnected } from './wifi';
+import { messagingActions } from './messaging';
+import { scheduledActions } from './scheduled';
+import { accessAppConfigM } from './config';
 
-export { AppConfigLive } from './config';
-
-const checkWifiAndConnectIfNotConnected = pipe(
-    info('checking wifi connection'),
-    T.andThen(pipe(
-        runProcess('iwgetid', ['-r']),
-        S.runDrain,
-    )),
-    T.andThen(info('a wifi connection exists')),
-    T.orElse(() => pipe(
-        info('a wifi connection does not exist, starting wifi connect'),
-        T.andThen(pipe(
-            runProcess(`${process.cwd()}/wifi-connect`, []),
-            S.runDrain,
-        )),
-        T.orElse(() => warn('wifi connect exited with a non-zero error code')),
-    )),
-);
-
-const logAndPublish = (msg: string) => (res: DeviceResult) => pipe(
-    T.access(({ [DeviceConfigURI]: config }: DeviceConfig) => config),
-    T.chain((config) => pipe(
+const logAndPublish = (msg: string) => (res: ResultAction) => pipe(
+    accessAppConfigM((config) => pipe(
         info(msg),
         T.andThen(publish(config.writeChannel, res)),
     )),
@@ -42,58 +21,49 @@ const logAndPublish = (msg: string) => (res: DeviceResult) => pipe(
     S.fromEffect,
 );
 
-const receiveDeviceMessages = pipe(
-    S.unwrap<unknown, Env, DeviceMessage>(receiveScheduledMessages),
-    S.merge(S.unwrap<unknown, Env, DeviceMessage>(receiveCommunicatedMessages as any)),
-);
-
-const handleDeviceMessage = DeviceMessage.matchStrict({
+const handleDeviceMessage = DeviceAction.matchStrict({
     StartPump: () => pipe(
-        startPump,
-        T.map(() => DeviceResult.of.PumpStarted({})),
-        T.catchAllCause(() => T.succeed(DeviceResult.of.Failure({}))),
+        writePin(4, 'ON'),
+        T.map(() => ResultAction.of.PumpStarted({})),
+        T.catchAllCause(() => T.succeed(ResultAction.of.DeviceFailure({}))),
         S.fromEffect,
     ),
     StopPump: () => pipe(
-        stopPump,
-        T.map(() => DeviceResult.of.PumpStopped({})),
-        T.catchAllCause(() => T.succeed(DeviceResult.of.Failure({}))),
+        writePin(4, 'OFF'),
+        T.map(() => ResultAction.of.PumpStopped({})),
+        T.catchAllCause(() => T.succeed(ResultAction.of.DeviceFailure({}))),
         S.fromEffect,
     ),
-    TakeLightReading: () => pipe(
-        takeReading(0),
-        S.map((value) => DeviceResult.of.LightReading({
+    TakeReading: ({ payload }) => pipe(
+        payload.type === 'light'
+            ? readSPI(0)
+            : readSPI(5),
+        S.map((value) => ResultAction.of.ReadingTaken({
             payload: {
+                type: payload.type,
                 value,
-                time: new Date(),
+                taken: new Date(),
             },
         })),
     ),
-    TakeMoistureReading: () => pipe(
-        takeReading(5),
-        S.map((value) => DeviceResult.of.MoistureReading({
-            payload: {
-                value,
-                time: new Date(),
-            },
-        })),s
-    ),
 });
 
-const handleDeviceResult = DeviceResult.matchStrict({
+const handleDeviceResult = ResultAction.matchStrict({
     PumpStarted: logAndPublish('pump started'),
     PumpStopped: logAndPublish('pump stopped'),
-    LightReading: logAndPublish('light reading taken'),
-    MoistureReading: logAndPublish('moisture reading taken'),
-    Failure: logAndPublish('failure'),
+    ReadingTaken: logAndPublish('moisture reading taken'),
+    DeviceFailure: logAndPublish('failure'),
 });
 
 export const app = pipe(
     checkWifiAndConnectIfNotConnected,
     T.andThen(pipe(
-        receiveDeviceMessages,
+        messagingActions,
+        S.merge(scheduledActions),
         S.chain(handleDeviceMessage),
         S.chain(handleDeviceResult),
         S.runDrain,
     )),
 );
+
+export { AppConfigLive } from './config';

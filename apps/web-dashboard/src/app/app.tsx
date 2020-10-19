@@ -1,27 +1,23 @@
 import React from 'react';
-import { useDispatch, useStore, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
-import * as A from 'fp-ts/Array';
-import * as E from 'fp-ts/Either';
-import { pipe } from 'fp-ts/function';
-import moment from 'moment';
-import { Route, Link } from 'react-router-dom';
+import * as A from '@effect-ts/core/Classic/Array';
+import { pipe } from '@effect-ts/core/Function';
 
-import { DeviceMessage, LightReading, MoistureReading } from '@curiosity-foundation/types-messages';
-import { State } from './data';
-import { CommunicationAction } from '@curiosity-foundation/service-communication';
+import { State, DeviceAction } from '@curiosity-foundation/feature-device-io';
+import { MessagingAction } from '@curiosity-foundation/feature-messaging';
 
 export const App = () => {
 
     const state = useSelector((x: State) => x);
     const dispatch = useDispatch();
 
-    const onStartClick = () => dispatch(DeviceMessage.of.StartPump({}));
+    const onStartClick = () => dispatch(DeviceAction.of.StartPump({}));
 
-    const onStopClick = () => dispatch(DeviceMessage.of.StopPump({}));
-    
-    const onListenClick = () => dispatch(CommunicationAction.of.StartListening({}));
-    
+    const onStopClick = () => dispatch(DeviceAction.of.StopPump({}));
+
+    const onListenClick = () => dispatch(MessagingAction.of.StartListening({}));
+
     return (
         <div>
             <button onClick={onListenClick}>Listen</button>
@@ -33,14 +29,14 @@ export const App = () => {
             <Plot
                 data={[
                     {
-                        x: pipe(
-                            state.moistureReadings,
-                            A.map(({ time }) => time),
-                        ),
-                        y: pipe(
-                            state.moistureReadings,
-                            A.map(({ value }) => value),
-                        ),
+                        // x: pipe(
+                        //     state.moistureReadings,
+                        //     A.map(({ taken }) => taken),
+                        // ),
+                        // y: pipe(
+                        //     state.moistureReadings,
+                        //     A.map(({ value }) => value),
+                        // ),
                         type: 'scatter',
                         mode: 'lines+markers',
                         marker: { color: 'blue' },
@@ -60,14 +56,14 @@ export const App = () => {
             <Plot
                 data={[
                     {
-                        x: pipe(
-                            state.lightReadings,
-                            A.map(({ time }) => time),
-                        ),
-                        y: pipe(
-                            state.lightReadings,
-                            A.map(({ value }) => value),
-                        ),
+                        // x: pipe(
+                        //     state.lightReadings,
+                        //     A.map(({ taken }) => taken),
+                        // ),
+                        // y: pipe(
+                        //     state.lightReadings,
+                        //     A.map(({ value }) => value),
+                        // ),
                         type: 'scatter',
                         mode: 'lines+markers',
                         marker: { color: 'green' },

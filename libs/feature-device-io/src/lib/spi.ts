@@ -1,7 +1,8 @@
-import { verbose } from '@curiosity-foundation/service-logger';
 import * as T from '@effect-ts/core/Effect';
 import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
+
+import { verbose } from '@curiosity-foundation/feature-logging';
 
 import { accessRPIOM } from './client';
 

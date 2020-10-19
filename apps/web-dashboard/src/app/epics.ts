@@ -1,58 +1,69 @@
 import * as T from '@effect-ts/core/Effect';
-import * as E from '@effect-ts/core/Classic/Either';
 import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
 
-import { DeviceResult, DeviceMessage } from '@curiosity-foundation/types-messages';
 import { cycle } from '@curiosity-foundation/effect-ts-cycle';
-import { log } from '@curiosity-foundation/service-logger';
-import { listen, CommunicationAction, CommunicationEvent, getHistory, publish } from '@curiosity-foundation/service-communication';
+import {
+    MessagingAction,
+    MessagingEvent,
+    getHistory,
+    listen,
+    publish,
+} from '@curiosity-foundation/feature-messaging';
+import {
+    DeviceAction,
+    ResultAction,
+    decodeResultAction,
+    State,
+} from '@curiosity-foundation/feature-device-io';
 
-import { State } from './data';
-import { AppConfig, AppConfigURI } from './constants';
+import { accessAppConfig } from './config';
 
-export const receiveDeviceResults = cycle<State, CommunicationAction>()(
+export const receiveDeviceResults = cycle<State, MessagingAction, ResultAction>()(
     (action$) => pipe(
         action$,
-        S.chain((a) => CommunicationAction.is.StartListening(a)
+        S.chain((a) => MessagingAction.is.StartListening(a)
             ? pipe(
-                S.access(({ [AppConfigURI]: config }: AppConfig) => config),
+                accessAppConfig((config) => config),
+                S.fromEffect,
                 S.chain((config) => pipe(
                     listen([config.readChannel]),
                     S.merge(getHistory(config.readChannel, 200)),
                 )),
-                S.mapConcat(CommunicationEvent.matchStrict({
-                    presence: () => [],
-                    publishResponse: () => [],
+                S.mapConcatM(MessagingEvent.matchStrict({
+                    presence: () => T.succeed([]),
+                    publishResponse: () => T.succeed([]),
                     message: (ev) => pipe(
                         ev.message,
-                        DeviceResult.type.decode,
-                        E.fold(
-                            () => [],
-                            (msg) => [msg],
-                        ),
+                        decodeResultAction,
+                        T.map((action) => [action]),
+                        T.catchAll(() => T.succeed([])),
                     ),
-                    status: () => [],
+                    status: () => T.succeed([]),
                     historyMessage: (ev) => pipe(
                         ev.entry,
-                        DeviceResult.type.decode,
-                        E.fold(
-                            () => [],
-                            (msg) => [msg],
-                        ),
+                        decodeResultAction,
+                        T.map((action) => [action]),
+                        T.catchAll(() => T.succeed([])),
                     ),
                 })),
             )
-            : S.fromArray([]))
-    ));
+            : S.fromArray([]),
+        ),
+    ),
+);
 
-export const publishDeviceActions = cycle<State, DeviceMessage>()(
+export const publishDeviceActions = cycle<State, DeviceAction>()(
     (action$) => pipe(
         action$,
-        S.chain((a) => DeviceMessage.is.StartPump(a) || DeviceMessage.is.StopPump(a)
+        S.chain((a) => DeviceAction.is.StartPump(a) || DeviceAction.is.StopPump(a)
             ? pipe(
-                S.access(({ [AppConfigURI]: config }) => config),
-                S.mapM((config) => publish(config.writeChannel, a)),
+                accessAppConfig((config) => config),
+                S.fromEffect,
+                S.mapConcatM((config) => pipe(
+                    publish(config.writeChannel, a),
+                    T.andThen(T.succeed([])),
+                )),
             )
             : S.fromArray([]))
     ),

@@ -4,9 +4,8 @@ import { pipe } from '@effect-ts/core/Function';
 import axios from 'axios';
 
 import { cycle } from '@curiosity-foundation/effect-ts-cycle';
-import { log } from '@curiosity-foundation/service-logger';
 import { AuthAction, AuthState } from '@curiosity-foundation/feature-auth';
-import { LicensesAction, UnclaimedLicense } from '@curiosity-foundation/feature-licenses';
+import { LicensesAction } from '@curiosity-foundation/feature-licenses';
 
 import { AppConfig, AppConfigURI, State } from './constants';
 
