@@ -7,7 +7,8 @@ import { cycle } from '@curiosity-foundation/effect-ts-cycle';
 import { AuthAction, AuthState } from '@curiosity-foundation/feature-auth';
 import { LicensesAction } from '@curiosity-foundation/feature-licenses';
 
-import { AppConfig, AppConfigURI, State } from './constants';
+import { accessAppConfigM } from './config';
+import { State } from './store';
 
 export const getTokenAndProfileAfterLoggingIn = cycle<any, AuthAction>()(
     (action$) => pipe(
@@ -36,7 +37,7 @@ export const fetchUnclaimedLicenses = cycle<State, LicensesAction>()(
                 LoggingOut: () => [],
             })),
             S.mapM((accessToken) => pipe(
-                T.accessM(({ [AppConfigURI]: config }: AppConfig) =>
+                accessAppConfigM((config) =>
                     T.fromPromise(() => axios.get(
                         `${config.apiURL}/licenses`,
                         {

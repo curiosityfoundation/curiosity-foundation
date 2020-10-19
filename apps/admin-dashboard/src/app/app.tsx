@@ -5,7 +5,7 @@ import { Button, Container, Icon, Menu, Header, Segment, Table } from 'semantic-
 import { AuthAction, AuthState } from '@curiosity-foundation/feature-auth';
 import { LicensesAction, UnclaimedLicensesState } from '@curiosity-foundation/feature-licenses';
 
-import { State } from './constants';
+import { State } from './store';
 
 import 'semantic-ui-css/semantic.min.css';
 
@@ -33,7 +33,7 @@ const renderNavbar = (props: {
             </Menu.Menu>
         </Menu>
     ),
-    LoggedIn: ({ error, user, accessToken }) => (
+    LoggedIn: ({ error, user }) => (
         <Menu>
             <Menu.Menu position='right'>
                 <Menu.Item>

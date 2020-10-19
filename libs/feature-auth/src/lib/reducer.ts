@@ -49,7 +49,7 @@ export const authReducer = AuthAction.createReducer(init)({
         LoggedIn: ({ user, error }) => AuthState.of.LoggedIn({
             user,
             error,
-            accessToken: payload,
+            accessToken: payload.accessToken,
         }), 
     }),
 });

@@ -6,26 +6,27 @@ import { cycle } from '@curiosity-foundation/effect-ts-cycle';
 import { info } from '@curiosity-foundation/feature-logging';
 
 import { AuthAction } from './action';
-import {
-    AuthConfig,
-    AuthConfigURI,
-    SPAAuth,
-    SPAAuthURI,
-} from './constants';
+import { accessAuth0Client } from './client';
+import { accessAuth0Config } from './config';
+import { decodeUser } from './model';
 
 export const loginWithSPACycle = cycle<any, AuthAction>()(
     (action$) => pipe(
         action$,
         S.chain((a) => AuthAction.is.StartLogin(a)
             ? pipe(
-                S.access(({
-                    [SPAAuthURI]: auth,
-                    [AuthConfigURI]: config
-                }: SPAAuth & AuthConfig) => ({ auth, config })),
-                S.mapM(({ auth, config }) => pipe(
+                accessAuth0Client(({ client }) => client),
+                T.chain((client) => pipe(
+                    accessAuth0Config((config) => ({
+                        config,
+                        client,
+                    })),
+                )),
+                S.fromEffect,
+                S.mapM(({ client, config }) => pipe(
                     info('logging in'),
                     T.andThen(T.fromPromise(
-                        () => auth.loginWithPopup({
+                        () => client.loginWithPopup({
                             redirect_uri: config.redirectURI,
                             clientID: config.clientId,
                             domain: config.domain,
@@ -35,7 +36,8 @@ export const loginWithSPACycle = cycle<any, AuthAction>()(
                     T.andThen(pipe(
                         info(`getting profile`),
                         T.andThen(pipe(
-                            T.fromPromise(() => auth.getUser({})),
+                            T.fromPromise(() => client.getUser({})),
+                            T.chain(decodeUser),
                             T.map((user) => AuthAction.of.LoginSuccess({ payload: user }))
                         )),
                     )),
@@ -57,9 +59,10 @@ export const logoutWithSPACycle = cycle<any, AuthAction>()(
         action$,
         S.chain((a) => AuthAction.is.StartLogout(a)
             ? pipe(
-                S.access(({ [SPAAuthURI]: auth }: SPAAuth) => (auth)),
-                S.mapM((auth) => pipe(
-                    T.effectTotal(() => auth.logout({})),
+                accessAuth0Client(({client}) => client),
+                S.fromEffect,
+                S.mapM((client) => pipe(
+                    T.effectTotal(() => client.logout({})),
                     T.map(() => AuthAction.of.LogoutSuccess({})),
                     T.catchAll(({ message, name }: Error) => pipe(
                         info(`logout failed: ${message}`),
@@ -79,13 +82,17 @@ export const getAccessTokenWithSPA = cycle<any, AuthAction>()(
         action$,
         S.chain((a) => AuthAction.is.GetAccessToken(a)
             ? pipe(
-                S.access(({
-                    [SPAAuthURI]: auth,
-                    [AuthConfigURI]: config
-                }: SPAAuth & AuthConfig) => ({ auth, config })),
-                S.mapM(({ auth, config }) => pipe(
+                accessAuth0Client(({ client }) => client),
+                T.chain((client) => pipe(
+                    accessAuth0Config((config) => ({
+                        config,
+                        client,
+                    })),
+                )),
+                S.fromEffect,
+                S.mapM(({ client, config }) => pipe(
                     info('getting token'),
-                    T.andThen(T.fromPromise(() => auth.getTokenSilently({
+                    T.andThen(T.fromPromise(() => client.getTokenSilently({
                         redirect_uri: config.redirectURI,
                         clientID: config.clientId,
                         domain: config.domain,
@@ -94,7 +101,7 @@ export const getAccessTokenWithSPA = cycle<any, AuthAction>()(
                         redirectUri: config.callbackURL,
                         scope: config.scope,
                     }))),
-                    T.orElse(() => T.fromPromise(() => auth.getTokenWithPopup({
+                    T.orElse(() => T.fromPromise(() => client.getTokenWithPopup({
                         redirect_uri: config.redirectURI,
                         clientID: config.clientId,
                         domain: config.domain,

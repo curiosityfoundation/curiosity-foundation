@@ -22,6 +22,29 @@ export function makePayloadAction<
     }, { name: type }));
 }
 
+export function makeSimpleState<T extends string>(type: T) {
+    return M.make((F) => F.interface({
+        state: F.stringLiteral(type),
+    }, { name: type }));
+}
+
+export function makeState<
+    T extends string,
+    P,
+    O,
+    >(
+        name: T,
+        data: M.M<{}, Readonly<P>, Readonly<O>>,
+) {
+    return M.make((F) => F.intersection([
+        F.interface({
+            state: F.stringLiteral(name),
+        }),
+        data(F),
+    ], { name }));
+}
+
+
 export function makeAsyncActions<
     T extends string,
     F extends string,
