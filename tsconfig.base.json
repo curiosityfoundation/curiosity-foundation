@@ -16,18 +16,6 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@curiosity-foundation/types-messages": [
-        "libs/types-messages/src/index.ts"
-      ],
-      "@curiosity-foundation/service-logger": [
-        "libs/service-logger/src/index.ts"
-      ],
-      "@curiosity-foundation/service-communication": [
-        "libs/service-communication/src/index.ts"
-      ],
-      "@curiosity-foundation/morphic-redux": [
-        "libs/morphic-redux/src/index.ts"
-      ],
       "@curiosity-foundation/effect-ts-cycle": [
         "libs/effect-ts-cycle/src/index.ts"
       ],

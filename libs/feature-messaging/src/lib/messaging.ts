@@ -67,7 +67,7 @@ export const getHistory = (channel: string, count: number) => pipe(
                 cb(T.fail(O.none));
             },
             (err) => {
-                console.log('ERROR!!!', err);
+                // TODO: handle errors here
                 cb(T.fail(O.none))
             },
         );
