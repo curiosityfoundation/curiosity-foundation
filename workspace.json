@@ -546,6 +546,29 @@
           }
         }
       }
+    },
+    "adapter-fetch": {
+      "root": "libs/adapter-fetch",
+      "sourceRoot": "libs/adapter-fetch/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/adapter-fetch/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/adapter-fetch/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/adapter-fetch/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

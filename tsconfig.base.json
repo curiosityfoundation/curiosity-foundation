@@ -39,7 +39,8 @@
       ],
       "@curiosity-foundation/feature-http-client": [
         "libs/feature-http-client/src/index.ts"
-      ]
+      ],
+      "@curiosity-foundation/adapter-fetch": ["libs/adapter-fetch/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -71,6 +71,9 @@
     },
     "feature-http-client": {
       "tags": []
+    },
+    "adapter-fetch": {
+      "tags": []
     }
   }
 }
