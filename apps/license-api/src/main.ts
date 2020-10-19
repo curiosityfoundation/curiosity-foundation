@@ -10,7 +10,7 @@ import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
 import * as Licenses from '@curiosity-foundation/feature-licenses';
 import * as DB from '@curiosity-foundation/feature-db';
-import * as Server from '@curiosity-foundation/feature-http-server';
+import * as Express from '@curiosity-foundation/adapter-express';
 
 const { AUTH0_DOMAIN, PORT, AUTH0_AUDIENCE, MONGO_CONNECTION_STRING } = process.env;
 
@@ -31,24 +31,24 @@ const checkJwt = jwt({
 });
 
 const Router = L.all(
-    Server.Route({
+    Express.Route({
         name: 'index',
         path: '/',
         method: 'get',
         handler: pipe(
             Licenses.listUnclaimedLicenses,
-            T.map((result) => Server.routeResponse(200)({ result })),
-            T.mapError(() => Server.routeError(200)({}))
+            T.map((result) => Express.routeResponse(200)({ result })),
+            T.mapError(() => Express.routeError(200)({}))
         ),
     }),
-    Server.Route({
+    Express.Route({
         name: 'auth',
         path: '/auth',
         method: 'get',
         handler: pipe(
             Licenses.listUnclaimedLicenses,
-            T.map((result) => Server.routeResponse(200)({ result })),
-            T.mapError(() => Server.routeError(200)({}))
+            T.map((result) => Express.routeResponse(200)({ result })),
+            T.mapError(() => Express.routeError(200)({}))
         ),
         middleware: [
             checkJwt,
@@ -59,7 +59,7 @@ const Router = L.all(
 
 const waitProcessExit =
     (() =>
-        Server.until((res) => {
+        Express.until((res) => {
             process.on("SIGINT", () => {
                 res()
             })
@@ -74,7 +74,7 @@ const mongo = new MongoClient(
 );
 
 pipe(
-    Server.useMiddlewares([
+    Express.useMiddlewares([
         cors(),
         bodyParser.json(),
         bodyParser.urlencoded({
@@ -84,7 +84,7 @@ pipe(
     T.andThen(waitProcessExit),
     T.provideSomeLayer(Router),
     T.provideSomeLayer(Licenses.LicensePersistenceLive),
-    T.provideSomeLayer(Server.ExpressServerLive(Number(PORT))),
+    T.provideSomeLayer(Express.ExpressServerLive(Number(PORT))),
     T.provideSomeLayer(DB.MongoClientLive(mongo)),
     T.runMain,
 );

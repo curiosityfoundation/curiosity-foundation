@@ -1,5 +1,5 @@
 module.exports = {
-  displayName: 'feature-http-server',
+  displayName: 'adapter-redux-cycles',
   preset: '../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -10,5 +10,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/feature-http-server',
+  coverageDirectory: '../../coverage/libs/adapter-redux-cycles',
 };

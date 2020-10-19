@@ -162,29 +162,6 @@
         }
       }
     },
-    "effect-ts-cycle": {
-      "root": "libs/effect-ts-cycle",
-      "sourceRoot": "libs/effect-ts-cycle/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:lint",
-          "options": {
-            "linter": "eslint",
-            "tsConfig": ["libs/effect-ts-cycle/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/effect-ts-cycle/**/*"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/effect-ts-cycle/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
     "admin-dashboard": {
       "root": "apps/admin-dashboard",
       "sourceRoot": "apps/admin-dashboard/src",
@@ -432,29 +409,6 @@
         }
       }
     },
-    "feature-http-server": {
-      "root": "libs/feature-http-server",
-      "sourceRoot": "libs/feature-http-server/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:lint",
-          "options": {
-            "linter": "eslint",
-            "tsConfig": ["libs/feature-http-server/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/feature-http-server/**/*"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/feature-http-server/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
     "feature-logging": {
       "root": "libs/feature-logging",
       "sourceRoot": "libs/feature-logging/src",
@@ -519,6 +473,52 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/feature-device-io/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "adapter-express": {
+      "root": "libs/adapter-express",
+      "sourceRoot": "libs/adapter-express/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/adapter-express/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/adapter-express/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/adapter-express/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "adapter-redux-cycles": {
+      "root": "libs/adapter-redux-cycles",
+      "sourceRoot": "libs/adapter-redux-cycles/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/adapter-redux-cycles/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/adapter-redux-cycles/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/adapter-redux-cycles/jest.config.js",
             "passWithNoTests": true
           }
         }

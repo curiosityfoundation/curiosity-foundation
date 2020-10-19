@@ -3,7 +3,7 @@ import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
 import axios from 'axios';
 
-import { cycle } from '@curiosity-foundation/effect-ts-cycle';
+import { cycle } from '@curiosity-foundation/adapter-redux-cycles';
 import { AuthAction, AuthState } from '@curiosity-foundation/feature-auth';
 import { LicensesAction } from '@curiosity-foundation/feature-licenses';
 

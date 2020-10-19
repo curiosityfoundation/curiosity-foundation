@@ -2,7 +2,6 @@ import * as T from '@effect-ts/core/Effect';
 import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
 
-import { cycle } from '@curiosity-foundation/effect-ts-cycle';
 import {
     MessagingAction,
     MessagingEvent,
@@ -12,15 +11,13 @@ import {
 } from '@curiosity-foundation/feature-messaging';
 import {
     DeviceAction,
-    ResultAction,
     decodeResultAction,
-    State,
 } from '@curiosity-foundation/feature-device-io';
 
 import { accessAppConfig } from './config';
 
-export const receiveDeviceResults = cycle<State, MessagingAction, ResultAction>()(
-    (action$) => pipe(
+export const receiveDeviceResults =
+    (action$: S.UIO<MessagingAction>) => pipe(
         action$,
         S.chain((a) => MessagingAction.is.StartListening(a)
             ? pipe(
@@ -50,11 +47,10 @@ export const receiveDeviceResults = cycle<State, MessagingAction, ResultAction>(
             )
             : S.fromArray([]),
         ),
-    ),
-);
+    );
 
-export const publishDeviceActions = cycle<State, DeviceAction>()(
-    (action$) => pipe(
+export const publishDeviceActions =
+    (action$: S.UIO<DeviceAction>) => pipe(
         action$,
         S.chain((a) => DeviceAction.is.StartPump(a) || DeviceAction.is.StopPump(a)
             ? pipe(
@@ -66,5 +62,4 @@ export const publishDeviceActions = cycle<State, DeviceAction>()(
                 )),
             )
             : S.fromArray([]))
-    ),
-);
+    );

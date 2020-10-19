@@ -7,8 +7,8 @@ import { configureStore, Store, combineReducers } from '@reduxjs/toolkit';
 import * as IO from 'fp-ts/IO';
 import * as RC from 'redux-cycles'
 
+import { cycle as cycle_, embed } from '@curiosity-foundation/adapter-redux-cycles';
 import { LoggerLive } from '@curiosity-foundation/feature-logging';
-import { embed } from '@curiosity-foundation/effect-ts-cycle';
 import {
     authReducer,
     AuthState,
@@ -17,8 +17,13 @@ import {
     getAccessTokenWithSPA,
     Auth0ConfigLive,
     Auth0ClientLive,
+    AuthAction,
 } from '@curiosity-foundation/feature-auth';
-import { unclaimedLicensesReducer, UnclaimedLicensesState } from '@curiosity-foundation/feature-licenses';
+import { 
+    unclaimedLicensesReducer, 
+    UnclaimedLicensesState,
+    LicensesAction, 
+} from '@curiosity-foundation/feature-licenses';
 
 import { getTokenAndProfileAfterLoggingIn, fetchUnclaimedLicenses } from './cycles';
 import { AppConfigLive } from './config';
@@ -27,6 +32,8 @@ export type State = {
     auth: AuthState;
     unclaimedLicenses: UnclaimedLicensesState;
 };
+
+export type Action = AuthAction | LicensesAction;
 
 export const createStore: IO.IO<Store> = () => {
 
@@ -60,12 +67,14 @@ export const createStore: IO.IO<Store> = () => {
         T.provideSomeLayer,
     );
 
+    const cycle = cycle_<State, Action>();
+
     const rootCycle = embed(
-        loginWithSPACycle,
-        logoutWithSPACycle,
-        getAccessTokenWithSPA,
-        getTokenAndProfileAfterLoggingIn,
-        fetchUnclaimedLicenses,
+        cycle(loginWithSPACycle),
+        cycle(logoutWithSPACycle),
+        cycle(getAccessTokenWithSPA),
+        cycle(getTokenAndProfileAfterLoggingIn),
+        cycle(fetchUnclaimedLicenses),
     )(provideEnv);
 
     const reducer = combineReducers({

@@ -1,5 +1,5 @@
 module.exports = {
-  displayName: 'effect-ts-cycle',
+  displayName: 'adapter-express',
   preset: '../../jest.preset.js',
   globals: {
     'ts-jest': {
@@ -10,5 +10,5 @@ module.exports = {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/effect-ts-cycle',
+  coverageDirectory: '../../coverage/libs/adapter-express',
 };

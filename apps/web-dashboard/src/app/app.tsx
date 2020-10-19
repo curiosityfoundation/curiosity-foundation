@@ -1,15 +1,15 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Plot from 'react-plotly.js';
-import * as A from '@effect-ts/core/Classic/Array';
-import { pipe } from '@effect-ts/core/Function';
+// import * as A from '@effect-ts/core/Classic/Array';
+// import { pipe } from '@effect-ts/core/Function';
 
-import { State, DeviceAction } from '@curiosity-foundation/feature-device-io';
+import { DeviceIOState, DeviceAction } from '@curiosity-foundation/feature-device-io';
 import { MessagingAction } from '@curiosity-foundation/feature-messaging';
 
 export const App = () => {
 
-    const state = useSelector((x: State) => x);
+    const state = useSelector((x: DeviceIOState) => x);
     const dispatch = useDispatch();
 
     const onStartClick = () => dispatch(DeviceAction.of.StartPump({}));

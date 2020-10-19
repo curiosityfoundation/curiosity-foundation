@@ -16,18 +16,12 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@curiosity-foundation/effect-ts-cycle": [
-        "libs/effect-ts-cycle/src/index.ts"
-      ],
       "@curiosity-foundation/feature-licenses": [
         "libs/feature-licenses/src/index.ts"
       ],
       "@curiosity-foundation/feature-auth": ["libs/feature-auth/src/index.ts"],
       "@curiosity-foundation/util-types": ["libs/util-types/src/index.ts"],
       "@curiosity-foundation/feature-db": ["libs/feature-db/src/index.ts"],
-      "@curiosity-foundation/feature-http-server": [
-        "libs/feature-http-server/src/index.ts"
-      ],
       "@curiosity-foundation/feature-logging": [
         "libs/feature-logging/src/index.ts"
       ],
@@ -36,6 +30,12 @@
       ],
       "@curiosity-foundation/feature-device-io": [
         "libs/feature-device-io/src/index.ts"
+      ],
+      "@curiosity-foundation/adapter-express": [
+        "libs/adapter-express/src/index.ts"
+      ],
+      "@curiosity-foundation/adapter-redux-cycles": [
+        "libs/adapter-redux-cycles/src/index.ts"
       ]
     }
   },

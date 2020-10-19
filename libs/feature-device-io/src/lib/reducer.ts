@@ -1,7 +1,7 @@
-import { State, setPumpRunning, appendLightReading, appendMoistureReading, setErrorTrue } from './state';
+import { DeviceIOState, setPumpRunning, appendLightReading, appendMoistureReading, setErrorTrue } from './state';
 import { ResultAction } from './action-result';
 
-const init = State.build({
+const init = DeviceIOState.build({
     moistureReadings: [],
     lightReadings: [],
     pumpRunning: false,

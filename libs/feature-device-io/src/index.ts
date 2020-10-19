@@ -4,5 +4,5 @@ export { ResultAction, encodeResultAction, decodeResultAction } from './lib/acti
 export * from './lib/gpio';
 export * from './lib/spi';
 export * from './lib/client';
-export { State } from './lib/state';
+export { DeviceIOState } from './lib/state';
 export { reducer } from './lib/reducer';

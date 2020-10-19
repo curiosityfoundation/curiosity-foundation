@@ -2,7 +2,6 @@ import * as T from '@effect-ts/core/Effect';
 import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
 
-import { cycle } from '@curiosity-foundation/effect-ts-cycle';
 import { info } from '@curiosity-foundation/feature-logging';
 
 import { AuthAction } from './action';
@@ -10,8 +9,8 @@ import { accessAuth0Client } from './client';
 import { accessAuth0Config } from './config';
 import { decodeUser } from './model';
 
-export const loginWithSPACycle = cycle<any, AuthAction>()(
-    (action$) => pipe(
+export const loginWithSPACycle =
+    (action$: S.UIO<AuthAction>) => pipe(
         action$,
         S.chain((a) => AuthAction.is.StartLogin(a)
             ? pipe(
@@ -51,15 +50,14 @@ export const loginWithSPACycle = cycle<any, AuthAction>()(
             )
             : S.fromArray([]),
         ),
-    ),
-);
+    );
 
-export const logoutWithSPACycle = cycle<any, AuthAction>()(
-    (action$) => pipe(
+export const logoutWithSPACycle =
+    (action$: S.UIO<AuthAction>) => pipe(
         action$,
         S.chain((a) => AuthAction.is.StartLogout(a)
             ? pipe(
-                accessAuth0Client(({client}) => client),
+                accessAuth0Client(({ client }) => client),
                 S.fromEffect,
                 S.mapM((client) => pipe(
                     T.effectTotal(() => client.logout({})),
@@ -74,11 +72,10 @@ export const logoutWithSPACycle = cycle<any, AuthAction>()(
             )
             : S.fromArray([]),
         ),
-    ),
-);
+    );
 
-export const getAccessTokenWithSPA = cycle<any, AuthAction>()(
-    (action$) => pipe(
+export const getAccessTokenWithSPA =
+    (action$: S.UIO<AuthAction>) => pipe(
         action$,
         S.chain((a) => AuthAction.is.GetAccessToken(a)
             ? pipe(
@@ -124,5 +121,4 @@ export const getAccessTokenWithSPA = cycle<any, AuthAction>()(
             )
             : S.fromArray([]),
         ),
-    ),
-);
+    );

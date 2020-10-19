@@ -7,13 +7,17 @@ import * as RC from 'redux-cycles'
 import { run as runCycle } from '@cycle/most-run'
 import { pipe } from '@effect-ts/core/Function';
 
-import { embed } from '@curiosity-foundation/effect-ts-cycle';
+import { DeviceAction, DeviceIOState } from '@curiosity-foundation/feature-device-io';
+import { cycle as cycle_, embed } from '@curiosity-foundation/adapter-redux-cycles';
 import { LoggerLive } from '@curiosity-foundation/feature-logging';
-import { PubnubClientLive } from '@curiosity-foundation/feature-messaging';
-import { reducer } from '@curiosity-foundation/feature-device-io';
+import { MessagingAction, PubnubClientLive } from '@curiosity-foundation/feature-messaging';
+import { reducer, ResultAction } from '@curiosity-foundation/feature-device-io';
 
-import { publishDeviceActions, receiveDeviceResults } from './epics';
+import { publishDeviceActions, receiveDeviceResults } from './cycles';
 import { AppConfigLive } from './config';
+
+export type State = DeviceIOState;
+export type Action = MessagingAction | ResultAction | DeviceAction;
 
 export const createStore: IO.IO<Store> = () => {
 
@@ -40,9 +44,11 @@ export const createStore: IO.IO<Store> = () => {
         T.provideSomeLayer,
     );
 
+    const cycle = cycle_<State, Action>();
+
     const rootCycle = embed(
-        publishDeviceActions,
-        receiveDeviceResults,
+        cycle(publishDeviceActions),
+        cycle(receiveDeviceResults),
     )(provideEnv);
 
     const store = configureStore({

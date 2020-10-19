@@ -32,9 +32,6 @@
       "tags": [],
       "implicitDependencies": ["web-dashboard"]
     },
-    "effect-ts-cycle": {
-      "tags": []
-    },
     "admin-dashboard": {
       "tags": []
     },
@@ -57,9 +54,6 @@
     "feature-db": {
       "tags": []
     },
-    "feature-http-server": {
-      "tags": []
-    },
     "feature-logging": {
       "tags": []
     },
@@ -67,6 +61,12 @@
       "tags": []
     },
     "feature-device-io": {
+      "tags": []
+    },
+    "adapter-express": {
+      "tags": []
+    },
+    "adapter-redux-cycles": {
       "tags": []
     }
   }
