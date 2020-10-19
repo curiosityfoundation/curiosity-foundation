@@ -4,18 +4,20 @@ import { pipe } from '@effect-ts/core/Function';
 import * as Schedule from '@effect-ts/core/Effect/Schedule';
 
 import { DeviceMessage } from '@curiosity-foundation/types-messages';
-import { log } from '@curiosity-foundation/service-logger';
+import { info } from '@curiosity-foundation/feature-logging';
 
-import { DeviceConfig, DeviceConfigURI } from './constants';
+import { accessAppConfigM } from './config';
 
 export const receiveScheduledMessages = pipe(
-    T.access(({ [DeviceConfigURI]: config }: DeviceConfig) => config),
-    T.tap((config) => log(`starting fixed schedule of ${config.readInterval}ms`)),
-    T.map((config) => pipe(
-        S.fromSchedule(Schedule.fixed(config.readInterval)),
-        S.mapConcat(() => [
-            DeviceMessage.of.TakeMoistureReading({}),
-            DeviceMessage.of.TakeLightReading({}),
-        ]),
-    )),
+    accessAppConfigM((config) => pipe(
+        info(`starting fixed schedule of ${config.readInterval}ms`),
+        T.andThen(pipe(
+            S.fromSchedule(Schedule.fixed(config.readInterval)),
+            S.mapConcat(() => [
+                DeviceMessage.of.TakeMoistureReading({}),
+                DeviceMessage.of.TakeLightReading({}),
+            ]),
+            T.succeed,
+        ))
+    ))
 );

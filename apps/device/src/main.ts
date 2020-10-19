@@ -3,14 +3,36 @@ import { pipe } from '@effect-ts/core/Function';
 import * as winston from 'winston';
 import * as Pubnub from 'pubnub';
 
-import { Logger, LoggerURI } from '@curiosity-foundation/service-logger';
+import { LoggerLive } from '@curiosity-foundation/feature-logging';
 import { Communication, CommunicationURI } from '@curiosity-foundation/service-communication';
 
-import { app } from './app';
+import { app, AppConfigLive } from './app';
 import { DeviceConfig, DeviceConfigURI } from './app/constants';
+
+const provideAppConfig = pipe(
+    {
+        readChannel: String(process.env.READ_CHANNEL),
+        writeChannel: String(process.env.WRITE_CHANNEL),
+        readInterval: Number(process.env.SENSOR_READ_INTERVAL),
+    },
+    AppConfigLive,
+    T.provideSomeLayer,
+)
+
+const provideLogger = pipe(
+    winston.createLogger({
+        transports: [new winston.transports.Console({
+            level: 'verbose',
+        })],
+    }),
+    LoggerLive,
+    T.provideSomesLayer,
+);
 
 pipe(
     app,
+    provideLogger,
+    provideAppConfig,
     T.provide<Communication & Logger & DeviceConfig>({
         [LoggerURI]: winston.createLogger({
             transports: [new winston.transports.Console({

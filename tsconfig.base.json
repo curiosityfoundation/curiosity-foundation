@@ -39,6 +39,15 @@
       "@curiosity-foundation/feature-db": ["libs/feature-db/src/index.ts"],
       "@curiosity-foundation/feature-http-server": [
         "libs/feature-http-server/src/index.ts"
+      ],
+      "@curiosity-foundation/feature-logging": [
+        "libs/feature-logging/src/index.ts"
+      ],
+      "@curiosity-foundation/feature-messaging": [
+        "libs/feature-messaging/src/index.ts"
+      ],
+      "@curiosity-foundation/feature-device-io": [
+        "libs/feature-device-io/src/index.ts"
       ]
     }
   },

@@ -71,6 +71,15 @@
     },
     "feature-http-server": {
       "tags": []
+    },
+    "feature-logging": {
+      "tags": []
+    },
+    "feature-messaging": {
+      "tags": []
+    },
+    "feature-device-io": {
+      "tags": []
     }
   }
 }

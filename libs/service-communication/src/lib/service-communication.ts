@@ -8,7 +8,7 @@ import { AOfMorhpADT, AType, EType } from "@morphic-ts/summoners";
 
 import { ADTType, ofType, makeADT } from '@morphic-ts/adt';
 import { verbose } from '@curiosity-foundation/service-logger';
-import * as Pubnub from 'pubnub';
+import type * as Pubnub from 'pubnub';
 
 const { summon, tagged } = summonFor<{}>({});
 

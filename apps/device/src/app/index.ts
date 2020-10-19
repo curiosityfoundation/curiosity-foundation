@@ -3,7 +3,7 @@ import * as S from '@effect-ts/core/Effect/Stream';
 import { pipe } from '@effect-ts/core/Function';
 
 import { publish } from '@curiosity-foundation/service-communication';
-import { log, warn } from '@curiosity-foundation/service-logger';
+import { info, warn } from '@curiosity-foundation/feature-logging';
 import { DeviceMessage, DeviceResult } from '@curiosity-foundation/types-messages';
 
 import { runProcess } from './run-process';
@@ -13,15 +13,17 @@ import { receiveCommunicatedMessages } from './receive-communicated';
 import { receiveScheduledMessages } from './receive-scheduled';
 import { DeviceConfig, DeviceConfigURI, Env } from './constants';
 
+export { AppConfigLive } from './config';
+
 const checkWifiAndConnectIfNotConnected = pipe(
-    log('checking wifi connection'),
+    info('checking wifi connection'),
     T.andThen(pipe(
         runProcess('iwgetid', ['-r']),
         S.runDrain,
     )),
-    T.andThen(log('a wifi connection exists')),
+    T.andThen(info('a wifi connection exists')),
     T.orElse(() => pipe(
-        log('a wifi connection does not exist, starting wifi connect'),
+        info('a wifi connection does not exist, starting wifi connect'),
         T.andThen(pipe(
             runProcess(`${process.cwd()}/wifi-connect`, []),
             S.runDrain,
@@ -33,7 +35,7 @@ const checkWifiAndConnectIfNotConnected = pipe(
 const logAndPublish = (msg: string) => (res: DeviceResult) => pipe(
     T.access(({ [DeviceConfigURI]: config }: DeviceConfig) => config),
     T.chain((config) => pipe(
-        log(msg),
+        info(msg),
         T.andThen(publish(config.writeChannel, res)),
     )),
     T.asUnit,
@@ -74,7 +76,7 @@ const handleDeviceMessage = DeviceMessage.matchStrict({
                 value,
                 time: new Date(),
             },
-        })),
+        })),s
     ),
 });
 

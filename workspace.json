@@ -561,6 +561,75 @@
           }
         }
       }
+    },
+    "feature-logging": {
+      "root": "libs/feature-logging",
+      "sourceRoot": "libs/feature-logging/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/feature-logging/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/feature-logging/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-logging/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "feature-messaging": {
+      "root": "libs/feature-messaging",
+      "sourceRoot": "libs/feature-messaging/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/feature-messaging/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/feature-messaging/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-messaging/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "feature-device-io": {
+      "root": "libs/feature-device-io",
+      "sourceRoot": "libs/feature-device-io/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/feature-device-io/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/feature-device-io/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-device-io/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
