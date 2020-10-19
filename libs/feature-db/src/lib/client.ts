@@ -1,4 +1,4 @@
-import { has, Has } from '@effect-ts/core/Classic/Has'
+import { has } from '@effect-ts/core/Classic/Has'
 import * as T from '@effect-ts/core/Effect'
 import * as M from '@effect-ts/core/Effect/Managed'
 import * as L from '@effect-ts/core/Effect/Layer';

@@ -43,9 +43,9 @@
   "dependencies": {
     "@auth0/auth0-spa-js": "^1.12.1",
     "@cycle/most-run": "^8.4.0",
-    "@effect-ts/core": "^0.4.4",
-    "@effect-ts/monocle": "^0.3.2",
-    "@effect-ts/morphic": "^0.2.4",
+    "@effect-ts/core": "^0.5.23",
+    "@effect-ts/monocle": "^0.4.23",
+    "@effect-ts/morphic": "^0.3.23",
     "@most/create": "^2.0.1",
     "@reduxjs/toolkit": "^1.4.0",
     "auth0-js": "^9.14.0",

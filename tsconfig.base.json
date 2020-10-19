@@ -36,6 +36,9 @@
       ],
       "@curiosity-foundation/adapter-redux-cycles": [
         "libs/adapter-redux-cycles/src/index.ts"
+      ],
+      "@curiosity-foundation/feature-http-client": [
+        "libs/feature-http-client/src/index.ts"
       ]
     }
   },

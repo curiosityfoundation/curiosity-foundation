@@ -68,6 +68,9 @@
     },
     "adapter-redux-cycles": {
       "tags": []
+    },
+    "feature-http-client": {
+      "tags": []
     }
   }
 }
