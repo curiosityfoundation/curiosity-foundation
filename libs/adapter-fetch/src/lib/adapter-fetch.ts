@@ -29,8 +29,8 @@ function getBody(
     )
 }
 
-export const ClientLive = (fetchApi: typeof fetch) =>
-    L.pure(H.Http)({
+export const FetchClientLive = (fetchApi: typeof fetch) =>
+    L.pure(H.HTTP)({
         ops: {
             request(
                 method: H.Method,
@@ -39,7 +39,7 @@ export const ClientLive = (fetchApi: typeof fetch) =>
                 responseType: H.ResponseType,
                 headers: Record<string, string>,
                 body: unknown
-            ): T.IO<H.HttpError<string>, H.Response<any>> {
+            ): T.IO<H.HTTPError<string>, H.Response<any>> {
 
                 const input: RequestInit = {
                     headers: {
@@ -110,7 +110,7 @@ export const ClientLive = (fetchApi: typeof fetch) =>
                             resp.text().then((text) => {
                                 cb(
                                     T.fail({
-                                        _tag: H.HttpErrorReason.Response,
+                                        _tag: H.HTTPErrorReason.Response,
                                         response: {
                                             headers: h,
                                             status: resp.status,
@@ -123,7 +123,7 @@ export const ClientLive = (fetchApi: typeof fetch) =>
                     }).catch((err) => {
                         cb(
                             T.fail({
-                                _tag: H.HttpErrorReason.Request,
+                                _tag: H.HTTPErrorReason.Request,
                                 error: err
                             })
                         )

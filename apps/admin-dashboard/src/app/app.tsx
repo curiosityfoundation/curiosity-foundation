@@ -201,10 +201,10 @@ const renderUnclaimedLicenses = (props: {
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {Object.keys(unclaimedLicenses).map((i) => (
+                        {unclaimedLicenses.map((v, i) => (
                             <Table.Row key={i}>
-                                <Table.Cell>{unclaimedLicenses[i].deviceId}</Table.Cell>
-                                <Table.Cell>{unclaimedLicenses[i].created}</Table.Cell>
+                                <Table.Cell>{v.deviceId}</Table.Cell>
+                                <Table.Cell>{v.created.toDateString()}</Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>
@@ -243,10 +243,10 @@ const renderUnclaimedLicenses = (props: {
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {Object.keys(unclaimedLicenses).map((i) => (
+                        {unclaimedLicenses.map((v, i) => (
                             <Table.Row key={i}>
-                                <Table.Cell>{unclaimedLicenses[i].deviceId}</Table.Cell>
-                                <Table.Cell>{unclaimedLicenses[i].created}</Table.Cell>
+                                <Table.Cell>{v.deviceId}</Table.Cell>
+                                <Table.Cell>{v.created.toDateString()}</Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>

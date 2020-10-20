@@ -1,13 +1,19 @@
 import * as M from '@effect-ts/morphic';
 
 import { makeAction, makePayloadAction } from '@curiosity-foundation/util-types';
-import { UnclaimedLicense } from './model';
+import { UnclaimedLicense, UnclaimedLicenseList } from './model';
 
 const FetchUnclaimedLicenses_ = makeAction('FetchUnclaimedLicenses');
 
 export interface FetchUnclaimedLicenses extends M.AType<typeof FetchUnclaimedLicenses_> { }
 export interface FetchUnclaimedLicensesRaw extends M.EType<typeof FetchUnclaimedLicenses_> { }
 export const FetchUnclaimedLicenses = M.opaque<FetchUnclaimedLicensesRaw, FetchUnclaimedLicenses>()(FetchUnclaimedLicenses_);
+
+const FetchUnclaimedLicensesInflight_ =  makeAction('FetchUnclaimedLicensesInflight');
+
+export interface FetchUnclaimedLicensesInflight extends M.AType<typeof FetchUnclaimedLicensesInflight_> { }
+export interface FetchUnclaimedLicensesInflightRaw extends M.EType<typeof FetchUnclaimedLicensesInflight_> { }
+export const FetchUnclaimedLicensesInflight = M.opaque<FetchUnclaimedLicensesInflightRaw, FetchUnclaimedLicensesInflight>()(FetchUnclaimedLicensesInflight_);
 
 const FetchUnclaimedLicensesFailure_ = makePayloadAction(
     'FetchUnclaimedLicensesFailure',
@@ -23,7 +29,7 @@ export const FetchUnclaimedLicensesFailure = M.opaque<FetchUnclaimedLicensesFail
 
 const FetchUnclaimedLicensesSuccess_ = makePayloadAction(
     'FetchUnclaimedLicensesSuccess',
-    M.make((F) => F.record(UnclaimedLicense(F))),
+    M.make((F) => UnclaimedLicenseList(F)),
 );
 
 export interface FetchUnclaimedLicensesSuccess extends M.AType<typeof FetchUnclaimedLicensesSuccess_> { }
@@ -32,6 +38,7 @@ export const FetchUnclaimedLicensesSuccess = M.opaque<FetchUnclaimedLicensesSucc
 
 export const LicensesAction = M.makeADT('type')({
     FetchUnclaimedLicenses,
+    FetchUnclaimedLicensesInflight,
     FetchUnclaimedLicensesFailure,
     FetchUnclaimedLicensesSuccess,
 });

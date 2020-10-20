@@ -9,11 +9,11 @@ import { nanoid } from 'nanoid';
 import { accessMongoClientM } from '@curiosity-foundation/feature-db';
 
 import {
-    decodeUnclaimedLicense,
     encodeUnclaimedLicense,
     encodeClaimedLicense,
     DeviceId,
     InsertClaimedLicense,
+    decodeUnclaimedLicenseList,
 } from './model';
 
 const makeLicensePersistence = () => ({
@@ -40,10 +40,9 @@ const makeLicensePersistence = () => ({
                 .find({})
                 .toArray())
         ),
-        T.chain((docs) => pipe(
-            docs,
-            A.map(decodeUnclaimedLicense),
-            T.collectAllPar,
+        T.chain((unclaimedLicenses) => pipe(
+            { unclaimedLicenses },
+            decodeUnclaimedLicenseList,
         )),
     ),
     // check found is not undef before proceeding

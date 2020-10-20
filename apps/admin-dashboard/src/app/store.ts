@@ -6,6 +6,7 @@ import { pipe } from '@effect-ts/core/Function';
 import { configureStore, Store, combineReducers } from '@reduxjs/toolkit';
 import * as IO from 'fp-ts/IO';
 import * as RC from 'redux-cycles'
+import fetch from 'isomorphic-fetch'
 
 import { cycle as cycle_, embed } from '@curiosity-foundation/adapter-redux-cycles';
 import { LoggerLive } from '@curiosity-foundation/feature-logging';
@@ -19,11 +20,13 @@ import {
     Auth0ClientLive,
     AuthAction,
 } from '@curiosity-foundation/feature-auth';
-import { 
-    unclaimedLicensesReducer, 
+import {
+    unclaimedLicensesReducer,
     UnclaimedLicensesState,
-    LicensesAction, 
+    LicensesAction,
 } from '@curiosity-foundation/feature-licenses';
+import { HTTPHeadersLive, HTTPMiddlewareStackLive } from '@curiosity-foundation/feature-http-client';
+import { FetchClientLive } from '@curiosity-foundation/adapter-fetch';
 
 import { getTokenAndProfileAfterLoggingIn, fetchUnclaimedLicenses } from './cycles';
 import { AppConfigLive } from './config';
@@ -63,6 +66,14 @@ export const createStore: IO.IO<Store> = () => {
                 callbackURL: 'http://localhost:4200/callback',
                 audience: String(process.env.NX_AUTH0_AUDIENCE),
             }),
+            HTTPHeadersLive({
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+            }),
+            FetchClientLive(fetch),
+            HTTPMiddlewareStackLive([]),
         ),
         T.provideSomeLayer,
     );

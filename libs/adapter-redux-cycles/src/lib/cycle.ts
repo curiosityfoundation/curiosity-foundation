@@ -76,7 +76,7 @@ export function embed<CS extends A.NonEmptyArray<AnyCycle>>(
                     ACTION: pipe(
                         toMost(cycle(
                             encaseMost(ACTION, toNever),
-                            encaseMost(STATE, toNever),
+                            encaseMost(STATE.sampleWith(ACTION), toNever),
                         )),
                         provider,
                         runToMost,

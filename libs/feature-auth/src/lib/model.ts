@@ -6,7 +6,7 @@ const User_ = M.make((F) => F.interface({
     email: F.string(),
     email_verified: F.boolean(),
     picture: F.string(),
-    updatedAt: F.date(),
+    updated_at: F.date(),
 }, { name: 'User' }));
 
 export interface User extends M.AType<typeof User_> { }

@@ -8,6 +8,7 @@ import { AuthAction } from './action';
 import { accessAuth0Client } from './client';
 import { accessAuth0Config } from './config';
 import { decodeUser } from './model';
+import { DecodeError } from '@effect-ts/morphic/Decoder/common';
 
 export const loginWithSPACycle =
     (action$: S.UIO<AuthAction>) => pipe(
@@ -37,7 +38,18 @@ export const loginWithSPACycle =
                         T.andThen(pipe(
                             T.fromPromise(() => client.getUser({})),
                             T.chain(decodeUser),
-                            T.map((user) => AuthAction.of.LoginSuccess({ payload: user }))
+                            T.map((user) => AuthAction.of.LoginSuccess({
+                                payload: user
+                            }))
+                        )),
+                        T.catchAll((err: DecodeError) => pipe(
+                            info(`decoding user failed: ${err.errors.length} errors`),
+                            T.andThen(T.succeed(AuthAction.of.LoginFailure({
+                                payload: {
+                                    message: err.errors[0].message,
+                                    name: err.errors[0].name,
+                                },
+                            }))),
                         )),
                     )),
                     T.catchAll(({ message, name }: Error) => pipe(
@@ -107,9 +119,9 @@ export const getAccessTokenWithSPA =
                         redirectUri: config.callbackURL,
                         scope: config.scope,
                     }))),
-                    T.chain((token) => pipe(
+                    T.chain((accessToken) => pipe(
                         info(`token received`),
-                        T.andThen(T.succeed(AuthAction.of.AccessTokenSuccess({ payload: token }))),
+                        T.andThen(T.succeed(AuthAction.of.AccessTokenSuccess({ payload: { accessToken } }))),
                     )),
                     T.catchAll(({ message, name }: Error) => pipe(
                         info(`login failed: ${message}`),

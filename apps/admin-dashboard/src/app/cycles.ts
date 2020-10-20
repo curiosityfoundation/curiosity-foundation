@@ -1,53 +1,57 @@
 import * as T from '@effect-ts/core/Effect';
 import * as S from '@effect-ts/core/Effect/Stream';
+import * as O from '@effect-ts/core/Classic/Option';
 import { pipe } from '@effect-ts/core/Function';
-import axios from 'axios';
 
-import { cycle } from '@curiosity-foundation/adapter-redux-cycles';
+import * as H from '@curiosity-foundation/feature-http-client';
 import { AuthAction, AuthState } from '@curiosity-foundation/feature-auth';
-import { LicensesAction } from '@curiosity-foundation/feature-licenses';
+import { LicensesAction, decodeUnclaimedLicenseList } from '@curiosity-foundation/feature-licenses';
+import { info } from '@curiosity-foundation/feature-logging';
 
 import { accessAppConfigM } from './config';
 import { State } from './store';
 
-export const getTokenAndProfileAfterLoggingIn = cycle<any, AuthAction>()(
-    (action$) => pipe(
+export const getTokenAndProfileAfterLoggingIn =
+    (action$: S.UIO<AuthAction>) => pipe(
         action$,
         S.mapConcat((a) => AuthAction.is.LoginSuccess(a)
             ? [AuthAction.of.GetAccessToken({})]
             : []
         ),
-    ),
-);
+    );
 
-export const fetchUnclaimedLicenses = cycle<State, LicensesAction>()(
-    (action$, state$) => pipe(
+export const fetchUnclaimedLicenses =
+    (action$: S.UIO<LicensesAction>, state$: S.UIO<State>) => pipe(
         action$,
-        S.chain((a) => LicensesAction.is.FetchUnclaimedLicenses(a)
-            ? S.fromArray([a])
+        S.zipWith(
+            state$,
+            (a, s) => [a, s] as [LicensesAction, State],
+        ),
+        S.chain(([a, state]) => LicensesAction.is.FetchUnclaimedLicenses(a)
+            ? pipe(
+                state.auth,
+                AuthState.matchStrict<string[]>({
+                    LoggedOut: () => [],
+                    LoggingIn: () => [],
+                    LoggedIn: ({ accessToken }) => [accessToken],
+                    LoggingOut: () => [],
+                }),
+                S.fromArray,
+                S.mapM((accessToken) => accessAppConfigM((config) => pipe(
+                    H.get(`${config.apiURL}/licenses`),
+                    H.withHeaders({ authorization: accessToken }),
+                    T.chain((resp) => pipe(
+                        resp.body,
+                        O.getOrElse(() => ({})),
+                        decodeUnclaimedLicenseList,
+                    )),
+                    T.map((payload) => LicensesAction.of.FetchUnclaimedLicensesSuccess({ payload })),
+                    T.catchAll(() => T.succeed(LicensesAction.of.FetchUnclaimedLicensesSuccess({
+                        payload: { unclaimedLicenses: [] },
+                    }))),
+                ))),
+                S.merge(S.succeed(LicensesAction.of.FetchUnclaimedLicensesInflight({}))),
+            )
             : S.empty,
         ),
-        S.chain(() => pipe(
-            state$,
-            S.map(({ auth }) => auth),
-            S.mapConcat(AuthState.matchStrict<string[]>({
-                LoggedOut: () => [],
-                LoggingIn: () => [],
-                LoggedIn: ({ accessToken }) => [accessToken],
-                LoggingOut: () => [],
-            })),
-            S.mapM((accessToken) => pipe(
-                accessAppConfigM((config) =>
-                    T.fromPromise(() => axios.get(
-                        `${config.apiURL}/licenses`,
-                        {
-                            headers: { authorization: accessToken },
-                        },
-                    ))
-                ),
-                T.map((x) => LicensesAction.of.FetchUnclaimedLicensesSuccess({ payload: x.data.result })),
-                T.catchAll(() => T.succeed(LicensesAction.of.FetchUnclaimedLicensesSuccess({ payload: {} }))),
-            )),
-        )),
-    ),
-);
+    );

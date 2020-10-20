@@ -95,7 +95,6 @@ export const on = <R = unknown, E = never, A = unknown>(
                             },
                             (x) => {
                                 // fail
-                                console.log(x);
                                 res.status(500).send({
                                     status: 'failed',
                                 })
@@ -187,12 +186,17 @@ export interface ExpressServer {
 }
 
 export const useMiddleware = (middleware: connect.NextHandleFunction) =>
-    accessExpressServerM(({ express }) => T.effectTotal(() => { express.use(middleware); }));
+    accessExpressServerM(({ express }) =>
+        T.effectTotal(() => {
+            express.use(middleware);
+        }));
 
 export const useMiddlewares = (middlewares: connect.NextHandleFunction[]) =>
     accessExpressServerM(({ express }) => pipe(
         middlewares,
-        A.map((middleware) => T.effectTotal(() => { express.use(middleware); })),
+        A.map((middleware) => T.effectTotal(() => { 
+            express.use(middleware); 
+        })),
         T.collectAllPar,
         T.asUnit,
     ));

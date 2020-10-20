@@ -103,61 +103,61 @@ export interface Response<Body> {
     status: number
 }
 
-export const HttpErrorReason = {
-    Request: 'HttpErrorRequest',
-    Response: 'HttpErrorResponse'
+export const HTTPErrorReason = {
+    Request: 'HTTPErrorRequest',
+    Response: 'HTTPErrorResponse'
 } as const
 
-export type HttpErrorReason = typeof HttpErrorReason
+export type HTTPErrorReason = typeof HTTPErrorReason
 
-export interface HttpResponseError<ErrorBody> {
-    _tag: HttpErrorReason['Response']
+export interface HTTPResponseError<ErrorBody> {
+    _tag: HTTPErrorReason['Response']
     response: Response<ErrorBody>
 }
 
-export function isHttpResponseError(u: unknown): u is HttpResponseError<unknown> {
-    return typeof u === 'object' && u !== null && u['_tag'] === 'HttpResponseError'
+export function isHTTPResponseError(u: unknown): u is HTTPResponseError<unknown> {
+    return typeof u === 'object' && u !== null && u['_tag'] === 'HTTPResponseError'
 }
 
-export interface HttpRequestError {
-    _tag: HttpErrorReason['Request']
+export interface HTTPRequestError {
+    _tag: HTTPErrorReason['Request']
     error: Error
 }
 
-export function isHttpRequestError(u: unknown): u is HttpRequestError {
-    return typeof u === 'object' && u !== null && u['_tag'] === 'HttpRequestError'
+export function isHTTPRequestError(u: unknown): u is HTTPRequestError {
+    return typeof u === 'object' && u !== null && u['_tag'] === 'HTTPRequestError'
 }
 
-export function isHttpError(u: unknown): u is HttpError<unknown> {
-    return isHttpRequestError(u) || isHttpResponseError(u)
+export function isHTTPError(u: unknown): u is HTTPError<unknown> {
+    return isHTTPRequestError(u) || isHTTPResponseError(u)
 }
 
-export type HttpError<ErrorBody> = HttpRequestError | HttpResponseError<ErrorBody>
+export type HTTPError<ErrorBody> = HTTPRequestError | HTTPResponseError<ErrorBody>
 
-export function foldHttpError<A, B, ErrorBody>(
+export function foldHTTPError<A, B, ErrorBody>(
     onError: (e: Error) => A,
     onResponseError: (e: Response<ErrorBody>) => B
-): (err: HttpError<ErrorBody>) => A | B {
+): (err: HTTPError<ErrorBody>) => A | B {
     return (err) => {
         switch (err._tag) {
-            case 'HttpErrorRequest':
+            case 'HTTPErrorRequest':
                 return onError(err.error)
-            case 'HttpErrorResponse':
+            case 'HTTPErrorResponse':
                 return onResponseError(err.response)
         }
     }
 }
 
-export interface HttpHeaders {
+export interface HTTPHeaders {
     headers: Record<string, string>
 }
 
-export const HttpHeaders = has<HttpHeaders>();
+export const HTTPHeaders = has<HTTPHeaders>();
 
-export const HttpHeadersLive = (headers: Record<string, string>) =>
-    L.pure(HttpHeaders)({ headers });
+export const HTTPHeadersLive = (headers: Record<string, string>) =>
+    L.pure(HTTPHeaders)({ headers });
 
-export interface HttpOps {
+export interface HTTPOps {
     request<M extends Method, Req extends RequestType, Resp extends ResponseType>(
         method: M,
         url: string,
@@ -165,18 +165,18 @@ export interface HttpOps {
         responseType: Resp,
         headers: Record<string, string>,
         body: RequestBodyTypes[Req][M]
-    ): T.IO<HttpError<string>, Response<ResponseTypes[Resp][M]>>
+    ): T.IO<HTTPError<string>, Response<ResponseTypes[Resp][M]>>
 }
 
-export interface Http {
-    ops: HttpOps
+export interface HTTP {
+    ops: HTTPOps
 }
 
-export const Http = has<Http>();
+export const HTTP = has<HTTP>();
 
-export const HttpLive = (ops: HttpOps) => L.pure(Http)({ ops });
+export const HTTPLive = (ops: HTTPOps) => L.pure(HTTP)({ ops });
 
-function hasHeaders(r: object): r is HttpHeaders {
+function hasHeaders(r: object): r is HTTPHeaders {
     return typeof r !== 'undefined'
 }
 
@@ -191,7 +191,7 @@ export type RequestF = <
     requestType: Req,
     responseType: Resp,
     body?: RequestBodyTypes[Req][M]
-) => T.Effect<RequestEnv & R, HttpError<string>, Response<ResponseTypes[Resp][M]>>
+) => T.Effect<RequestEnv & R, HTTPError<string>, Response<ResponseTypes[Resp][M]>>
 
 export type RequestMiddleware = (request: RequestF) => RequestF
 
@@ -201,13 +201,13 @@ export interface MiddlewareStack {
 
 export const MiddlewareStack = has<MiddlewareStack>();
 
-export const MiddlewareStackLive = (stack: RequestMiddleware[] = []) =>
+export const HTTPMiddlewareStackLive = (stack: RequestMiddleware[] = []) =>
     L.pure(MiddlewareStack)({
         stack
     });
 
-export type HttpEnv = Http & MiddlewareStack
-export type RequestEnv = HttpEnv
+export type HTTPEnv = Has<HTTP> & Has<MiddlewareStack>
+export type RequestEnv = HTTPEnv & Has<HTTPHeaders>;
 
 function foldMiddlewareStack(
     { stack }: MiddlewareStack,
@@ -237,17 +237,18 @@ export function requestInner<
     requestType: Req,
     responseType: Resp,
     body: RequestBodyTypes[Req][M]
-): T.Effect<RequestEnv & R, HttpError<string>, Response<ResponseTypes[Resp][M]>> {
-    return T.accessM((r: Http & R) =>
-        r.ops.request<M, Req, Resp>(
-            method,
-            url,
-            requestType,
-            responseType,
-            hasHeaders(r) ? r.headers : {},
-            body
-        )
-    )
+): T.Effect<RequestEnv & R, HTTPError<string>, Response<ResponseTypes[Resp][M]>> {
+    return T.accessServiceM(HTTP)((HTTP) =>
+        T.accessServiceM(HTTPHeaders)((headers) =>
+            HTTP.ops.request<M, Req, Resp>(
+                method,
+                url,
+                requestType,
+                responseType,
+                hasHeaders(headers) ? headers.headers : {},
+                body
+            )
+        ))
 }
 
 export function request<R, Req extends RequestType, Resp extends ResponseType>(
@@ -257,7 +258,7 @@ export function request<R, Req extends RequestType, Resp extends ResponseType>(
 ): (
         url: string,
         body?: RequestBodyTypes[Req]['GET']
-    ) => T.Effect<RequestEnv & R, HttpError<string>, Response<ResponseTypes[Resp]['GET']>>
+    ) => T.Effect<RequestEnv & R, HTTPError<string>, Response<ResponseTypes[Resp]['GET']>>
 export function request<R, Req extends RequestType, Resp extends ResponseType>(
     method: 'DELETE',
     requestType: Req,
@@ -267,7 +268,7 @@ export function request<R, Req extends RequestType, Resp extends ResponseType>(
         body?: RequestBodyTypes[Req]['DELETE']
     ) => T.Effect<
         RequestEnv & R,
-        HttpError<string>,
+        HTTPError<string>,
         Response<ResponseTypes[Resp]['DELETE']>
     >
 export function request<
@@ -282,7 +283,7 @@ export function request<
 ): (
         url: string,
         body: RequestBodyTypes[Req][M]
-    ) => T.Effect<RequestEnv & R, HttpError<string>, Response<ResponseTypes[Resp][M]>>
+    ) => T.Effect<RequestEnv & R, HTTPError<string>, Response<ResponseTypes[Resp][M]>>
 export function request<
     R,
     M extends Method,
@@ -295,7 +296,7 @@ export function request<
 ): (
         url: string,
         body: RequestBodyTypes[Req][M]
-    ) => T.Effect<RequestEnv & R, HttpError<string>, Response<ResponseTypes[Resp][M]>> {
+    ) => T.Effect<RequestEnv & R, HTTPError<string>, Response<ResponseTypes[Resp][M]>> {
     return (url, body) =>
         T.accessM((r: MiddlewareStack) =>
             foldMiddlewareStack(r, requestInner)<R, M, Req, Resp>(
@@ -383,23 +384,23 @@ export const delBinaryGetBinary =
 export function withHeaders(
     headers: Record<string, string>,
     replace = false
-): <R, E, A>(eff: T.Effect<R & Has<HttpHeaders>, E, A>) => T.Effect<R & Has<HttpHeaders>, E, A> {
+): <R, E, A>(eff: T.Effect<R & Has<HTTPHeaders>, E, A>) => T.Effect<R & Has<HTTPHeaders>, E, A> {
     return <R, E, A>(eff: T.Effect<R, E, A>) =>
         replace
             ? T.accessM((r: R) => pipe(
                 eff,
+                T.replaceService(HTTPHeaders, () => ({ headers })),
                 T.provide(r),
-                T.replaceService(HttpHeaders, () => ({ headers })),
             ))
             : T.accessM((r: R) => pipe(
                 eff,
-                T.provide(r),
-                T.replaceService(HttpHeaders, (existing) => ({
+                T.replaceService(HTTPHeaders, (existing) => ({
                     headers: {
                         ...existing.headers,
                         ...headers,
                     },
                 })),
+                T.provide(r),
             ))
 }
 

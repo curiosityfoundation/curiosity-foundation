@@ -4,7 +4,8 @@ import { UnclaimedLicensesState } from './state';
 const init = UnclaimedLicensesState.of.InitState({})
 
 export const unclaimedLicensesReducer = LicensesAction.createReducer(init)({
-    FetchUnclaimedLicenses: () => UnclaimedLicensesState.transform({
+    FetchUnclaimedLicenses: () => (s) => s,
+    FetchUnclaimedLicensesInflight: () => UnclaimedLicensesState.transform({
         InitState: () => UnclaimedLicensesState.of.PendingState({}),
         LeftState: ({ error }) => UnclaimedLicensesState.of.LeftState({
             refreshing: true,
@@ -38,15 +39,15 @@ export const unclaimedLicensesReducer = LicensesAction.createReducer(init)({
     FetchUnclaimedLicensesSuccess: ({ payload }) => UnclaimedLicensesState.transform({
         PendingState: () => UnclaimedLicensesState.of.RightState({
             refreshing: false,
-            unclaimedLicenses: payload,
+            unclaimedLicenses: payload.unclaimedLicenses,
         }),
         LeftState: () => UnclaimedLicensesState.of.RightState({
             refreshing: false,
-            unclaimedLicenses: payload,
+            unclaimedLicenses: payload.unclaimedLicenses,
         }),
         RightState: () => UnclaimedLicensesState.of.RightState({
             refreshing: false,
-            unclaimedLicenses: payload,
+            unclaimedLicenses: payload.unclaimedLicenses,
         }),
     }),
 });

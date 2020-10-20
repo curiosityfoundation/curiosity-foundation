@@ -35,6 +35,17 @@ export const UnclaimedLicense = M.opaque<UnclaimedLicenseRaw, UnclaimedLicense>(
 export const decodeUnclaimedLicense = strictDecoder(UnclaimedLicense).decode;
 export const encodeUnclaimedLicense = encoder(UnclaimedLicense).encode;
 
+const UnclaimedLicenseList_ = M.make((F) => F.interface({
+    unclaimedLicenses: F.array(UnclaimedLicense(F)),
+}, { name: 'UnclaimedLicenseList' }));
+
+export interface UnclaimedLicenseList extends M.AType<typeof UnclaimedLicenseList_> { }
+export interface UnclaimedLicenseListRaw extends M.EType<typeof UnclaimedLicenseList_> { }
+export const UnclaimedLicenseList = M.opaque<UnclaimedLicenseListRaw, UnclaimedLicenseList>()(UnclaimedLicenseList_);
+
+export const decodeUnclaimedLicenseList = strictDecoder(UnclaimedLicenseList).decode;
+export const encodeUnclaimedLicenseList = encoder(UnclaimedLicenseList).encode;
+
 const InsertClaimedLicense_ = M.make((F) => F.intersection([
     DeviceId(F),
     ClaimedBy(F),

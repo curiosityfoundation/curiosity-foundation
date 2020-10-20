@@ -1,16 +1,16 @@
 import * as T from '@effect-ts/core/Effect';
 import * as L from '@effect-ts/core/Effect/Layer';
 import { pipe } from '@effect-ts/core/Function';
-import * as express from 'express';
 import { MongoClient } from 'mongodb';
 import * as jwt from 'express-jwt';
 import * as jwtAuthz from 'express-jwt-authz';
 import * as jwksRsa from 'jwks-rsa';
 import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
+
+import * as Express from '@curiosity-foundation/adapter-express';
 import * as Licenses from '@curiosity-foundation/feature-licenses';
 import * as DB from '@curiosity-foundation/feature-db';
-import * as Express from '@curiosity-foundation/adapter-express';
 
 const { AUTH0_DOMAIN, PORT, AUTH0_AUDIENCE, MONGO_CONNECTION_STRING } = process.env;
 
@@ -33,27 +33,25 @@ const checkJwt = jwt({
 const Router = L.all(
     Express.Route({
         name: 'index',
-        path: '/',
+        path: '/licenses',
         method: 'get',
         handler: pipe(
             Licenses.listUnclaimedLicenses,
-            T.map((result) => Express.routeResponse(200)({ result })),
-            T.mapError(() => Express.routeError(200)({}))
-        ),
-    }),
-    Express.Route({
-        name: 'auth',
-        path: '/auth',
-        method: 'get',
-        handler: pipe(
-            Licenses.listUnclaimedLicenses,
-            T.map((result) => Express.routeResponse(200)({ result })),
+            T.map((result) => Express.routeResponse(200)({
+                unclaimedLicenses: [Licenses.UnclaimedLicense.build({
+                    _id: '123',
+                    deviceId: 'abc',
+                    created: new Date,
+                    modified: null,
+                })]
+            })),
+            // T.map((result) => Express.routeResponse(200)({ result })),
             T.mapError(() => Express.routeError(200)({}))
         ),
         middleware: [
+            cors({ origin: 'http://localhost:4200' }),
             checkJwt,
-            jwtAuthz(['read:licenses']),
-        ],
+        ]
     }),
 );
 
@@ -68,23 +66,17 @@ const waitProcessExit =
             })
         }))()
 
-const mongo = new MongoClient(
-    String(MONGO_CONNECTION_STRING),
-    { useUnifiedTopology: true },
-);
-
 pipe(
     Express.useMiddlewares([
-        cors(),
-        bodyParser.json(),
-        bodyParser.urlencoded({
-            extended: true
-        })
+        cors({ origin: 'http://localhost:4200' }),
     ]),
     T.andThen(waitProcessExit),
     T.provideSomeLayer(Router),
     T.provideSomeLayer(Licenses.LicensePersistenceLive),
     T.provideSomeLayer(Express.ExpressServerLive(Number(PORT))),
-    T.provideSomeLayer(DB.MongoClientLive(mongo)),
+    T.provideSomeLayer(DB.MongoClientLive(new MongoClient(
+        String(MONGO_CONNECTION_STRING),
+        { useUnifiedTopology: true },
+    ))),
     T.runMain,
 );

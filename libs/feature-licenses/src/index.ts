@@ -5,14 +5,17 @@ export {
     DeviceId,
     ClaimedBy,
     InsertClaimedLicense,
+    UnclaimedLicenseList,
     encodeClaimedLicense,
     encodeUnclaimedLicense,
     encodeDeviceId,
     encodeInsertClaimedLicense,
+    encodeUnclaimedLicenseList,
     decodeClaimedLicense,
     decodeDeviceId,
     decodeInsertClaimedLicense,
     decodeUnclaimedLicense,
+    decodeUnclaimedLicenseList,
 } from './lib/model';
 export { UnclaimedLicensesState } from './lib/state';
 export { unclaimedLicensesReducer } from './lib/reducer';
