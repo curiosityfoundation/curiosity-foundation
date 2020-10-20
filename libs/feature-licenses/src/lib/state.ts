@@ -2,7 +2,18 @@ import * as M from '@effect-ts/morphic';
 
 import { makeState, makeSimpleState } from '@curiosity-foundation/util-types';
 
-import { UnclaimedLicense, UnclaimedLicenseList } from './model';
+import { UnclaimedLicense } from './model';
+
+const UnclaimedLicenseTable_ = M.make((F) => F.interface({
+    unclaimedLicenses: F.interface({
+        byId: F.record(UnclaimedLicense(F)),
+        allIds: F.array(F.string()),
+    }),
+}, { name: 'UnclaimedLicenseTable' }));
+
+export interface UnclaimedLicenseTable extends M.AType<typeof UnclaimedLicenseTable_> { }
+export interface UnclaimedLicenseTableRaw extends M.EType<typeof UnclaimedLicenseTable_> { }
+export const UnclaimedLicenseTable = M.opaque<UnclaimedLicenseTableRaw, UnclaimedLicenseTable>()(UnclaimedLicenseTable_);
 
 const Error_ = M.make((F) => F.interface({
     error: F.string(),
@@ -47,7 +58,7 @@ export const LeftState = M.opaque<LeftStateRaw, LeftState>()(LeftState_);
 const RightState_ = makeState(
     'RightState',
     M.make((F) => F.intersection([
-        UnclaimedLicenseList(F),
+        UnclaimedLicenseTable(F),
         Refreshing(F),
     ])),
 );
@@ -59,7 +70,7 @@ export const RightState = M.opaque<RightStateRaw, RightState>()(RightState_);
 const BothState_ = makeState(
     'BothState',
     M.make((F) => F.intersection([
-        UnclaimedLicenseList(F),
+        UnclaimedLicenseTable(F),
         Error(F),
         Refreshing(F),
     ])),

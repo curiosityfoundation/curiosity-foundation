@@ -40,10 +40,6 @@ const Router = L.all(
         handler: pipe(
             Licenses.listUnclaimedLicenses,
             T.chain(Licenses.encodeUnclaimedLicenseList),
-            T.map((x) => {
-                console.log(x);
-                return x;
-            }),
             T.map((unclaimedLicenses) => Express.routeResponse(200)(unclaimedLicenses)),
             T.mapError(() => Express.routeError(200)({}))
         ),
