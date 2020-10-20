@@ -57,6 +57,7 @@
     "express-jwt": "^6.0.0",
     "express-jwt-authz": "^2.4.1",
     "fast-check": "^2.4.0",
+    "formik": "^2.2.0",
     "fp-ts": "^2.8.3",
     "fp-ts-contrib": "^0.1.21",
     "io-ts": "^2.2.10",

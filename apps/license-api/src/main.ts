@@ -7,9 +7,11 @@ import * as jwtAuthz from 'express-jwt-authz';
 import * as jwksRsa from 'jwks-rsa';
 import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
+import * as winston from 'winston';
 
 import * as Express from '@curiosity-foundation/adapter-express';
 import * as Licenses from '@curiosity-foundation/feature-licenses';
+import { info, LoggerLive } from '@curiosity-foundation/feature-logging';
 import * as DB from '@curiosity-foundation/feature-db';
 
 const { AUTH0_DOMAIN, PORT, AUTH0_AUDIENCE, MONGO_CONNECTION_STRING } = process.env;
@@ -37,21 +39,36 @@ const Router = L.all(
         method: 'get',
         handler: pipe(
             Licenses.listUnclaimedLicenses,
-            T.map((result) => Express.routeResponse(200)({
-                unclaimedLicenses: [Licenses.UnclaimedLicense.build({
-                    _id: '123',
-                    deviceId: 'abc',
-                    created: new Date,
-                    modified: null,
-                })]
-            })),
-            // T.map((result) => Express.routeResponse(200)({ result })),
+            T.chain(Licenses.encodeUnclaimedLicenseList),
+            T.map((x) => {
+                console.log(x);
+                return x;
+            }),
+            T.map((unclaimedLicenses) => Express.routeResponse(200)(unclaimedLicenses)),
             T.mapError(() => Express.routeError(200)({}))
         ),
         middleware: [
             cors({ origin: 'http://localhost:4200' }),
+            bodyParser.json(),
             checkJwt,
         ]
+    }),
+    Express.Route({
+        name: 'index',
+        path: '/licenses',
+        method: 'post',
+        handler: Express.accessRequestContextM(({ request }) => pipe(
+            request.body,
+            Licenses.decodeDeviceId,
+            T.chain(Licenses.insertUnclaimedLicense),
+            T.map(({ doc }) => Express.routeResponse(200)({ unclaimedLicense: doc })),
+            T.mapError(() => Express.routeError(200)({}))
+        )),
+        middleware: [
+            cors({ origin: 'http://localhost:4200' }),
+            bodyParser.json(),
+            checkJwt,
+        ],
     }),
 );
 
@@ -78,5 +95,10 @@ pipe(
         String(MONGO_CONNECTION_STRING),
         { useUnifiedTopology: true },
     ))),
+    T.provideSomeLayer(LoggerLive(winston.createLogger({
+        transports: [new winston.transports.Console({
+            level: 'verbose',
+        })],
+    }))),
     T.runMain,
 );

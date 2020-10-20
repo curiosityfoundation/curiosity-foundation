@@ -1,11 +1,13 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button, Container, Icon, Menu, Header, Segment, Table } from 'semantic-ui-react';
+import { Button, Container, Icon, Menu, Header, Segment, Table, Grid } from 'semantic-ui-react';
+import { Formik } from 'formik';
 
 import { AuthAction, AuthState } from '@curiosity-foundation/feature-auth';
-import { LicensesAction, UnclaimedLicensesState } from '@curiosity-foundation/feature-licenses';
+import { DeviceId, LicensesAction, UnclaimedLicensesState } from '@curiosity-foundation/feature-licenses';
 
-import { State } from './store';
+import { AppState, submitNewLicenseForm } from './store';
+import { NewLicenseForm } from './new-license-form';
 
 import 'semantic-ui-css/semantic.min.css';
 
@@ -62,6 +64,22 @@ const renderNavbar = (props: {
         </Menu>
     ),
 });
+
+const renderNewLicenseForm = AuthState.matchStrict({
+    LoggedIn: ({ accessToken }) => (
+        <Segment>
+            <Formik
+                onSubmit={submitNewLicenseForm(accessToken)}
+                initialValues={DeviceId.build({ deviceId: '' })}
+            >
+                {NewLicenseForm}
+            </Formik>
+        </Segment>
+    ),
+    LoggedOut: () => (<div></div>),
+    LoggingIn: () => (<div></div>),
+    LoggingOut: () => (<div></div>),
+})
 
 const renderUnclaimedLicenses = (props: {
     onFetchUnclaimedLicensesClick: () => void;
@@ -258,11 +276,10 @@ const renderUnclaimedLicenses = (props: {
 
 export const App = () => {
 
-    const state = useSelector((x: State) => x);
+    const state = useSelector((x: AppState) => x);
     const dispatch = useDispatch();
 
     const onLoginClick = () => dispatch(AuthAction.of.StartLogin({}));
-    const onGetTokenClick = () => dispatch(AuthAction.of.GetAccessToken({}));
     const onLogoutClick = () => dispatch(AuthAction.of.StartLogout({}));
     const onFetchUnclaimedLicensesClick = () => dispatch(LicensesAction.of.FetchUnclaimedLicenses({}));
 
@@ -272,11 +289,23 @@ export const App = () => {
                 onLoginClick,
                 onLogoutClick,
             })(state.auth)}
-            <Container>
-                {renderUnclaimedLicenses({
-                    onFetchUnclaimedLicensesClick,
-                })(state.unclaimedLicenses)}
-            </Container>
+            <Grid
+                columns={2}
+                stretched
+                style={{
+                    marginLeft: '1rem',
+                    marginRight: '1rem'
+                }}
+            >
+                <Grid.Column>
+                    {renderUnclaimedLicenses({
+                        onFetchUnclaimedLicensesClick,
+                    })(state.unclaimedLicenses)}
+                </Grid.Column>
+                <Grid.Column>
+                    {renderNewLicenseForm(state.auth)}
+                </Grid.Column>
+            </Grid>
         </div>
     );
 

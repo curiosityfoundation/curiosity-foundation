@@ -21,6 +21,9 @@ export const LoggerLive = ({ info, warn, verbose }: {
         verbose: (message: string) => T.asUnit(T.effectTotal(() => verbose(message))),
     }))();
 
+export const accessLogger = T.accessService(Logger);
+export const accessLoggerM = T.accessServiceM(Logger);
+
 export const {
     info,
     warn,

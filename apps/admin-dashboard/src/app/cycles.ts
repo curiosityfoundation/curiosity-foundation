@@ -9,7 +9,7 @@ import { LicensesAction, decodeUnclaimedLicenseList } from '@curiosity-foundatio
 import { info } from '@curiosity-foundation/feature-logging';
 
 import { accessAppConfigM } from './config';
-import { State } from './store';
+import { AppState } from './store';
 
 export const getTokenAndProfileAfterLoggingIn =
     (action$: S.UIO<AuthAction>) => pipe(
@@ -21,11 +21,11 @@ export const getTokenAndProfileAfterLoggingIn =
     );
 
 export const fetchUnclaimedLicenses =
-    (action$: S.UIO<LicensesAction>, state$: S.UIO<State>) => pipe(
+    (action$: S.UIO<LicensesAction>, state$: S.UIO<AppState>) => pipe(
         action$,
         S.zipWith(
             state$,
-            (a, s) => [a, s] as [LicensesAction, State],
+            (a, s) => [a, s] as [LicensesAction, AppState],
         ),
         S.chain(([a, state]) => LicensesAction.is.FetchUnclaimedLicenses(a)
             ? pipe(

@@ -13,6 +13,8 @@ import * as L from '@effect-ts/core/Effect/Layer'
 import * as M from '@effect-ts/core/Effect/Managed'
 import { has, Has } from '@effect-ts/core/Classic/Has'
 
+import { info, Logger, verbose } from '@curiosity-foundation/feature-logging';
+
 export type Method = 'post' | 'get' | 'put' | 'patch' | 'delete'
 
 export interface RouteError<E> {
@@ -28,25 +30,6 @@ export interface RouteResponse<A> {
 //
 // @category api
 //
-
-// export const accessApp = <A>(f: (_: Exp.Express) => A) =>
-//     T.accessService(ExpressServer)((_: Express) => T.map_(_[ExpressURI].accessApp, f))
-
-// export const accessAppM = <R, E, A>(f: (app: Exp.Express) => T.Effect<R, E, A>) =>
-//     T.chain_(accessApp(identity), f)
-
-// export const accessServer = <A>(f: (_: http.Server) => A) =>
-//     T.accessM((_: Express) => T.map_(_[ExpressURI].accessServer, f))
-
-// export const accessServerM = <R, E, A>(
-//     f: (_: http.Server) => T.Effect<R, E, A>
-// ) => T.accessM((_: Express) => T.chain_(accessServer(identity), f))
-
-// export const accessReq = <A>(f: (req: Exp.Request) => A) =>
-//     T.access(({ [RequestContextURI]: { request } }: RequestContext) => f(request))
-
-// export const accessReqM = <R, E, A>(f: (req: Exp.Request) => T.Effect<R, E, A>) =>
-//     T.chain_(accessReq(identity), f)
 
 export function routeError(status: number) {
     return <E>(body: E): RouteError<E> => ({
@@ -68,18 +51,22 @@ interface RequestContext {
 
 const RequestContext = has<RequestContext>();
 
+export const accessRequestContext = T.accessService(RequestContext);
+export const accessRequestContextM = T.accessServiceM(RequestContext);
+
 export const on = <R = unknown, E = never, A = unknown>(
     method: Method,
     path: string,
-    f: T.Effect<R, RouteError<E>, RouteResponse<A>>,
+    f: T.Effect<Has<RequestContext> & Has<Logger> & R, RouteError<E>, RouteResponse<A>>,
     ...rest: connect.NextHandleFunction[]
-): T.Effect<Has<ExpressServer> & R, never, void> =>
+): T.Effect<Has<ExpressServer> & Has<Logger> & R, never, void> =>
     accessExpressServerM(({ express }) =>
-        T.access((r: R) => {
+        T.access((r: R & Has<Logger>) => {
             express[method](path, ...(rest.length === 0 ? [Exp.json()] : rest), (req, res) => {
                 T.run(
                     pipe(
-                        f,
+                        verbose(`${method.toUpperCase()} ${path}`),
+                        T.andThen(f),
                         T.provideSomeLayer(L.fromConstructor(RequestContext)(() => ({
                             request: req
                         }))()),
@@ -129,7 +116,6 @@ export const on = <R = unknown, E = never, A = unknown>(
                             res.status(x.status).send(x.body)
                         },
                     )
-
                 )
             })
         })
@@ -143,7 +129,7 @@ type RouteObj<K extends string, R = unknown, E = never, A = unknown> = {
     name: K,
     method: Method;
     path: string;
-    handler: T.Effect<R, RouteError<E>, RouteResponse<A>>;
+    handler: T.Effect<R & Has<RequestContext> & Has<Logger>, RouteError<E>, RouteResponse<A>>;
     middleware?: connect.NextHandleFunction[];
 };
 
@@ -194,8 +180,8 @@ export const useMiddleware = (middleware: connect.NextHandleFunction) =>
 export const useMiddlewares = (middlewares: connect.NextHandleFunction[]) =>
     accessExpressServerM(({ express }) => pipe(
         middlewares,
-        A.map((middleware) => T.effectTotal(() => { 
-            express.use(middleware); 
+        A.map((middleware) => T.effectTotal(() => {
+            express.use(middleware);
         })),
         T.collectAllPar,
         T.asUnit,
@@ -203,31 +189,36 @@ export const useMiddlewares = (middlewares: connect.NextHandleFunction[]) =>
 
 const ExpressServer = has<ExpressServer>();
 
-const managedExpress = ({ hostname, port }: ExpressConfig) =>
+const managedExpress = ({ hostname = '0.0.0.0', port }: ExpressConfig) =>
     M.makeInterruptible(
         // release
         // TODO: catch close errors
         ({ server }: { express: Exp.Express; server: http.Server }) =>
-            T.effectAsync<unknown, never, void>((resolve) => {
-                server.close((err) => {
-                    resolve(T.succeed(undefined))
-                })
-            })
-    )(T.effectAsync<unknown, ExpressError, { express: Exp.Express; server: http.Server }>(
-        // acquire
-        // TODO: catch bind errors
-        (resolve) => {
-            const express = Exp();
-            const server = express.listen(port, hostname || '0.0.0.0', () => {
-                console.log('express listening at', port);
-                resolve(
-                    T.succeed({
-                        server,
-                        express,
+            pipe(
+                T.effectAsync<unknown, never, void>((resolve) => {
+                    server.close((err) => {
+                        resolve(T.succeed(undefined))
                     })
-                );
-            })
-        }
+                }),
+                T.tap(() => info(`closed express server on ${hostname}:${port}`))
+            ),
+    )(pipe(
+        T.effectAsync<unknown, ExpressError, { express: Exp.Express; server: http.Server }>(
+            // acquire
+            // TODO: catch bind errors
+            (resolve) => {
+                const express = Exp();
+                const server = express.listen(port, hostname, () => {
+                    resolve(
+                        T.succeed({
+                            server,
+                            express,
+                        })
+                    );
+                })
+            }
+        ),
+        T.tap(() => info(`express server listening on ${hostname}:${port}`))
     ));
 
 export type ExpressError = BindError | CloseError

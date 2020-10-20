@@ -1,4 +1,3 @@
-import * as A from '@effect-ts/core/Classic/Array';
 import { has } from '@effect-ts/core/Classic/Has';
 import * as O from '@effect-ts/core/Classic/Option';
 import * as T from '@effect-ts/core/Effect';
