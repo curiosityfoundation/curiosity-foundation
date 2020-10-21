@@ -87,7 +87,7 @@ export const logoutWithSPACycle =
     );
 
 export const getAccessTokenWithSPA =
-    (action$: S.UIO<AuthAction>) => pipe(
+    (action$: S.UIO<AuthAction>): S.UIO<AuthAction> => pipe(
         action$,
         S.chain((a) => AuthAction.is.GetAccessToken(a)
             ? pipe(

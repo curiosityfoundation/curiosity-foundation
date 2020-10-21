@@ -1,19 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-
-import { BrowserRouter } from 'react-router-dom';
+import { ConnectedRouter } from 'connected-react-router';
 
 import { App } from './app/app';
-import { createStore } from './app/store';
+import { createStore, history } from './app/store';
+
+import 'semantic-ui-css/semantic.min.css';
 
 ReactDOM.render(
-    <React.StrictMode>
-        <Provider store={createStore()}>
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
-        </Provider>
-    </React.StrictMode>,
+    <Provider store={createStore()}>
+        <ConnectedRouter history={history}>
+            <App />
+        </ConnectedRouter>
+    </Provider>,
     document.getElementById('root')
 );

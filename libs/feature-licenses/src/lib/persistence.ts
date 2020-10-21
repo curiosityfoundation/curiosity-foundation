@@ -13,6 +13,7 @@ import {
     DeviceId,
     InsertClaimedLicense,
     decodeUnclaimedLicenseList,
+    decodeClaimedLicenseList,
 } from './model';
 
 const makeLicensePersistence = () => ({
@@ -42,6 +43,18 @@ const makeLicensePersistence = () => ({
         T.chain((unclaimedLicenses) => pipe(
             { unclaimedLicenses },
             decodeUnclaimedLicenseList,
+        )),
+    ),
+    listClaimedLicenses: pipe(
+        accessMongoClientM(({ client }) =>
+            T.fromPromise(() => client.db('test')
+                .collection('claimedLicenses')
+                .find({})
+                .toArray())
+        ),
+        T.chain((claimedLicenses) => pipe(
+            { claimedLicenses },
+            decodeClaimedLicenseList,
         )),
     ),
     // check found is not undef before proceeding
@@ -86,6 +99,11 @@ export const LicensePersistenceLive = L.fromConstructor(LicensePersistence)(
     makeLicensePersistence
 )()
 
-export const { claimLicense, insertUnclaimedLicense, listUnclaimedLicenses } = T.deriveLifted(
+export const { 
+    claimLicense, 
+    insertUnclaimedLicense, 
+    listUnclaimedLicenses, 
+    listClaimedLicenses, 
+} = T.deriveLifted(
     LicensePersistence
-)(['claimLicense', 'insertUnclaimedLicense'], ['listUnclaimedLicenses'], [] as never[])
+)(['claimLicense', 'insertUnclaimedLicense'], ['listUnclaimedLicenses', 'listClaimedLicenses'], [] as never[])

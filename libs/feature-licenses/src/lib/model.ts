@@ -69,3 +69,14 @@ export const ClaimedLicense = M.opaque<ClaimedLicenseRaw, ClaimedLicense>()(Clai
 
 export const decodeClaimedLicense = strictDecoder(ClaimedLicense).decode;
 export const encodeClaimedLicense = encoder(ClaimedLicense).encode;
+
+const ClaimedLicenseList_ = M.make((F) => F.interface({
+    claimedLicenses: F.array(ClaimedLicense(F)),
+}, { name: 'ClaimedLicenseList' }));
+
+export interface ClaimedLicenseList extends M.AType<typeof ClaimedLicenseList_> { }
+export interface ClaimedLicenseListRaw extends M.EType<typeof ClaimedLicenseList_> { }
+export const ClaimedLicenseList = M.opaque<ClaimedLicenseListRaw, ClaimedLicenseList>()(ClaimedLicenseList_);
+
+export const decodeClaimedLicenseList = strictDecoder(ClaimedLicenseList).decode;
+export const encodeClaimedLicenseList = encoder(ClaimedLicenseList).encode;

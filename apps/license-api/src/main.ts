@@ -35,7 +35,7 @@ const checkJwt = jwt({
 const Router = L.all(
     Express.Route({
         name: 'index',
-        path: '/licenses',
+        path: '/licenses/unclaimed',
         method: 'get',
         handler: pipe(
             Licenses.listUnclaimedLicenses,
@@ -51,7 +51,7 @@ const Router = L.all(
     }),
     Express.Route({
         name: 'index',
-        path: '/licenses',
+        path: '/licenses/unclaimed',
         method: 'post',
         handler: Express.accessRequestContextM(({ request }) => pipe(
             request.body,
@@ -65,6 +65,22 @@ const Router = L.all(
             bodyParser.json(),
             checkJwt,
         ],
+    }),
+    Express.Route({
+        name: 'index',
+        path: '/licenses/claimed',
+        method: 'get',
+        handler: pipe(
+            Licenses.listClaimedLicenses,
+            T.chain(Licenses.encodeClaimedLicenseList),
+            T.map((claimedLicenses) => Express.routeResponse(200)(claimedLicenses)),
+            T.mapError(() => Express.routeError(200)({}))
+        ),
+        middleware: [
+            cors({ origin: 'http://localhost:4200' }),
+            bodyParser.json(),
+            checkJwt,
+        ]
     }),
 );
 

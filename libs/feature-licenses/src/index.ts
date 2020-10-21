@@ -1,4 +1,3 @@
-export { LicensesAction } from './lib/action';
 export { 
     UnclaimedLicense,
     ClaimedLicense,
@@ -6,22 +5,20 @@ export {
     ClaimedBy,
     InsertClaimedLicense,
     UnclaimedLicenseList,
+    ClaimedLicenseList,
     encodeClaimedLicense,
     encodeUnclaimedLicense,
     encodeDeviceId,
     encodeInsertClaimedLicense,
     encodeUnclaimedLicenseList,
+    encodeClaimedLicenseList,
     decodeClaimedLicense,
     decodeDeviceId,
     decodeInsertClaimedLicense,
     decodeUnclaimedLicense,
     decodeUnclaimedLicenseList,
+    decodeClaimedLicenseList,
 } from './lib/model';
-export { UnclaimedLicensesState } from './lib/state';
-export { unclaimedLicensesReducer } from './lib/reducer';
-export { 
-    LicensePersistenceLive, 
-    insertUnclaimedLicense, 
-    claimLicense, 
-    listUnclaimedLicenses 
-}from './lib/persistence';
+export * from './lib/persistence';
+export * from './lib/unclaimed-licenses-slice';
+export * from './lib/claimed-licenses-slice';

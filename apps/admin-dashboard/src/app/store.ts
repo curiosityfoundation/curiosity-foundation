@@ -6,7 +6,9 @@ import { pipe } from '@effect-ts/core/Function';
 import { configureStore, Store, combineReducers } from '@reduxjs/toolkit';
 import * as IO from 'fp-ts/IO';
 import * as RC from 'redux-cycles'
-import fetch from 'isomorphic-fetch'
+import fetch from 'isomorphic-fetch';
+import { createBrowserHistory } from 'history';
+import { connectRouter, routerMiddleware, RouterAction, RouterState } from 'connected-react-router';
 
 import { cycle as cycle_, embed } from '@curiosity-foundation/adapter-redux-cycles';
 import { info, LoggerLive } from '@curiosity-foundation/feature-logging';
@@ -15,29 +17,42 @@ import {
     AuthState,
     loginWithSPACycle,
     logoutWithSPACycle,
-    getAccessTokenWithSPA,
     Auth0ConfigLive,
     Auth0ClientLive,
     AuthAction,
 } from '@curiosity-foundation/feature-auth';
 import {
+    claimedLicensesReducer,
+    ClaimedLicensesState,
+    ClaimedLicensesAction,
     unclaimedLicensesReducer,
     UnclaimedLicensesState,
-    LicensesAction,
+    UnclaimedLicensesAction,
     DeviceId,
 } from '@curiosity-foundation/feature-licenses';
 import * as H from '@curiosity-foundation/feature-http-client';
 import { FetchClientLive } from '@curiosity-foundation/adapter-fetch';
 
-import { getTokenAndProfileAfterLoggingIn, fetchUnclaimedLicenses } from './cycles';
+import {
+    getTokenAndRedirectAfterLoggingIn,
+    fetchUnclaimedLicenses,
+    fetchClaimedLicenses,
+    getLicensesOnEnterLicensesRoute,
+    getAccessTokenAndRedirect,
+} from './cycles';
 import { AppConfigLive, accessAppConfigM } from './config';
 
 export type AppState = {
     auth: AuthState;
+    router: RouterState;
+    claimedLicenses: ClaimedLicensesState;
     unclaimedLicenses: UnclaimedLicensesState;
 };
 
-export type Action = AuthAction | LicensesAction;
+export type Action = AuthAction
+    | ClaimedLicensesAction
+    | UnclaimedLicensesAction
+    | RouterAction;
 
 const provideEnv = pipe(
     L.all(
@@ -83,7 +98,7 @@ const provideEnv = pipe(
 export const submitNewLicenseForm = (accessToken: string) =>
     (data: DeviceId) => pipe(
         accessAppConfigM((config) => pipe(
-            H.post(`${config.apiURL}/licenses`, data),
+            H.post(`${config.apiURL}/licenses/unclaimed`, data),
             H.withHeaders({
                 authorization: accessToken,
             }),
@@ -92,6 +107,8 @@ export const submitNewLicenseForm = (accessToken: string) =>
         provideEnv,
         T.runPromise,
     );
+
+export const history = createBrowserHistory();
 
 export const createStore: IO.IO<Store> = () => {
 
@@ -103,19 +120,26 @@ export const createStore: IO.IO<Store> = () => {
     const rootCycle = embed(
         cycle(loginWithSPACycle),
         cycle(logoutWithSPACycle),
-        cycle(getAccessTokenWithSPA),
-        cycle(getTokenAndProfileAfterLoggingIn),
+        cycle(getAccessTokenAndRedirect),
+        cycle(getTokenAndRedirectAfterLoggingIn),
         cycle(fetchUnclaimedLicenses),
+        cycle(getLicensesOnEnterLicensesRoute),
+        cycle(fetchClaimedLicenses),
     )(provideEnv);
 
     const reducer = combineReducers({
         auth: authReducer,
+        router: connectRouter(history),
+        claimedLicenses: claimedLicensesReducer,
         unclaimedLicenses: unclaimedLicensesReducer,
     });
 
     const store = configureStore({
         reducer,
-        middleware: [cycleMiddleware],
+        middleware: [
+            cycleMiddleware,
+            routerMiddleware(history),
+        ],
         devTools: true,
     });
 
