@@ -6,6 +6,7 @@ import { AuthAction } from '@curiosity-foundation/feature-auth';
 import { ClaimedLicensesAction, UnclaimedLicensesAction } from '@curiosity-foundation/feature-licenses';
 
 import { AppState } from './store';
+import { renderClaimLicenseForm } from './claim-license-form';
 import { renderNewLicenseForm } from './new-license-form';
 import { renderNavbar } from './navbar';
 import { renderClaimedLicenses } from './claimed-licenses';
@@ -30,24 +31,27 @@ export const LicensesPage = () => {
                 onLogoutClick,
             })(state.auth)}
             <Grid
-                columns={2}
                 stretched
+                verticalAlign='top'
                 style={{
                     marginLeft: '1rem',
                     marginRight: '1rem'
                 }}
             >
-                <Grid.Column>
-                    {renderNewLicenseForm(state.auth)}
-                    <br/>
+                <Grid.Column width={6}>
                     {renderUnclaimedLicenses({
                         onFetchUnclaimedLicensesClick,
                     })(state.unclaimedLicenses)}
                 </Grid.Column>
-                <Grid.Column>
+                <Grid.Column width={6}>
                     {renderClaimedLicenses({
                         onFetchClaimedLicensesClick,
                     })(state.claimedLicenses)}
+                </Grid.Column>
+                <Grid.Column width={4}>
+                    {renderClaimLicenseForm()}
+                    <br/>
+                    {renderNewLicenseForm(state.auth)}
                 </Grid.Column>
             </Grid>
         </div>

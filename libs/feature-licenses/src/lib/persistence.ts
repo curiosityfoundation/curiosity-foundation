@@ -6,6 +6,7 @@ import { pipe } from '@effect-ts/core/Function';
 import { nanoid } from 'nanoid';
 
 import { accessMongoClientM } from '@curiosity-foundation/feature-db';
+import { verbose } from '@curiosity-foundation/feature-logging';
 
 import {
     encodeUnclaimedLicense,
@@ -19,12 +20,14 @@ import {
 const makeLicensePersistence = () => ({
     insertUnclaimedLicense: ({ deviceId }: DeviceId) => pipe(
         T.do,
+        T.tap(() => verbose('encoding unclaimed license')),
         T.bind('doc', () => encodeUnclaimedLicense({
             deviceId,
             _id: nanoid(),
             created: new Date(),
             modified: O.none,
         })),
+        T.tap(() => verbose('inserting unclaimed license')),
         T.bind('inserted', ({ doc }) =>
             accessMongoClientM(({ client }) =>
                 T.fromPromise(() => client.db('test')
@@ -32,40 +35,49 @@ const makeLicensePersistence = () => ({
                     .insertOne(doc))
             ),
         ),
+        T.tap(() => verbose('unclaimed license inserted')),
     ),
     listUnclaimedLicenses: pipe(
-        accessMongoClientM(({ client }) =>
+        verbose('finding unclaimed licenses'),
+        T.andThen(accessMongoClientM(({ client }) =>
             T.fromPromise(() => client.db('test')
                 .collection('unclaimedLicenses')
                 .find({})
                 .toArray())
-        ),
+        )),
+        T.tap(() => verbose('decoding unclaimed licenses')),
         T.chain((unclaimedLicenses) => pipe(
             { unclaimedLicenses },
             decodeUnclaimedLicenseList,
         )),
+        T.tap(() => verbose('unclaimed licenses decoded')),
     ),
     listClaimedLicenses: pipe(
-        accessMongoClientM(({ client }) =>
+        verbose('finding claimed licenses'),
+        T.andThen(accessMongoClientM(({ client }) =>
             T.fromPromise(() => client.db('test')
                 .collection('claimedLicenses')
                 .find({})
                 .toArray())
-        ),
+        )),
+        T.tap(() => verbose('decoding claimed licenses')),
         T.chain((claimedLicenses) => pipe(
             { claimedLicenses },
             decodeClaimedLicenseList,
         )),
+        T.tap(() => verbose('claimed licenses decoded')),
     ),
     // check found is not undef before proceeding
     claimLicense: ({ deviceId, claimedBy }: InsertClaimedLicense) => pipe(
         T.do,
+        T.tap(() => verbose('finding unclaimed license')),
         T.bind('found', () => accessMongoClientM(
             ({ client }) => T.fromPromise(() =>
                 client.db('test')
                     .collection('unclaimedLicenses')
                     .findOne({ deviceId })),
         )),
+        T.tap(() => verbose('encoding claimed license')),
         T.bind('doc', () => encodeClaimedLicense({
             claimedBy,
             deviceId,
@@ -73,6 +85,7 @@ const makeLicensePersistence = () => ({
             created: new Date(),
             modified: O.none,
         })),
+        T.tap(() => verbose('inserting claimed license')),
         T.bind('inserted', ({ doc }) =>
             accessMongoClientM(({ client }) =>
                 T.fromPromise(() => client.db('test')
@@ -80,13 +93,15 @@ const makeLicensePersistence = () => ({
                     .insertOne(doc)),
             ),
         ),
+        T.tap(() => verbose('removing unclaimed license')),
         T.bind('removed', ({ found }) =>
             accessMongoClientM(({ client }) =>
                 T.fromPromise(() => client.db('test')
                     .collection('claimedLicenses')
-                    .deleteOne(found._id)),
+                    .deleteOne({ _id: found._id })),
             ),
         ),
+        T.tap(() => verbose('claimed license inserted and unclaimed license removed')),
     ),
 });
 
@@ -99,11 +114,11 @@ export const LicensePersistenceLive = L.fromConstructor(LicensePersistence)(
     makeLicensePersistence
 )()
 
-export const { 
-    claimLicense, 
-    insertUnclaimedLicense, 
-    listUnclaimedLicenses, 
-    listClaimedLicenses, 
+export const {
+    claimLicense,
+    insertUnclaimedLicense,
+    listUnclaimedLicenses,
+    listClaimedLicenses,
 } = T.deriveLifted(
     LicensePersistence
 )(['claimLicense', 'insertUnclaimedLicense'], ['listUnclaimedLicenses', 'listClaimedLicenses'], [] as never[])

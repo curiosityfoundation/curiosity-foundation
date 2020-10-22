@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { Button, Icon, Menu, Header, Segment, Table,  } from 'semantic-ui-react';
 
 import { 
@@ -7,7 +8,7 @@ import {
 } from '@curiosity-foundation/feature-licenses';
 
 const ClaimedLicenseTable: React.FC<ClaimedLicenseList> = (props) => (
-    <Table celled>
+    <Table celled compact>
         <Table.Header>
             <Table.Row>
                 <Table.HeaderCell>Device ID</Table.HeaderCell>
@@ -18,7 +19,7 @@ const ClaimedLicenseTable: React.FC<ClaimedLicenseList> = (props) => (
             {props.claimedLicenses.map((v, i) => (
                 <Table.Row key={i}>
                     <Table.Cell>{v.deviceId}</Table.Cell>
-                    <Table.Cell>{v.created.toDateString()}</Table.Cell>
+                    <Table.Cell>{moment(v.created).fromNow()}</Table.Cell>
                 </Table.Row>
             ))}
         </Table.Body>

@@ -1,10 +1,5 @@
-import * as T from '@effect-ts/core/Effect';
 import * as O from '@effect-ts/core/Classic/Option';
 import * as M from '@effect-ts/morphic';
-import * as ADT from '@effect-ts/morphic/Adt';
-import { MorphADT } from '@effect-ts/morphic/Batteries/usage/tagged-union';
-import { Reducer } from '@effect-ts/morphic/Adt/matcher';
-import { fail } from 'assert';
 
 export function makeAction<T extends string>(type: T) {
     return M.make((F) => F.interface({
@@ -218,67 +213,154 @@ export function makeAsyncSlice<
 
 }
 
-// type State = M.AType<typeof State>;
+// Form
 
-// type FetchAction<F> = {
-//     type: F;
-// }
+export function makeFormSlice<
+    SubmitT extends string,
+    FailureT extends string,
+    SuccessT extends string,
+    ResetT extends string,
+    InflightT extends string,
+    >(
+        submitType: SubmitT,
+        failureType: FailureT,
+        successType: SuccessT,
+        resetType: ResetT,
+        inflightType: InflightT,
+) {
 
-// type FailureAction<E> = {
-//     type: E;
-//     payload: {
-//         name: string;
-//         message: string;
-//     },
-// }
+    return function <
+        D extends {},
+        DO extends {},
+        E extends {},
+        EO extends {},
+        R extends {},
+        RO extends {},
+        >(
+            data: M.M<{}, Readonly<D>, Readonly<DO>>,
+            error: M.M<{}, Readonly<E>, Readonly<EO>>,
+            result: M.M<{}, Readonly<R>, Readonly<RO>>,
+    ) {
 
-// type SuccessAction<A, X> = {
-//     type: A;
-//     payload: X,
-// }
+        const Submit = makePayloadAction(submitType, data);
+        type Submit = M.AType<typeof Submit>;
+        const Inflight = makeAction(inflightType);
+        type Inflight = M.AType<typeof Inflight>;
+        const Failure = makePayloadAction(failureType, error);
+        type Failure = M.AType<typeof Failure>;
+        const Success = makePayloadAction(successType, result);
+        type Success = M.AType<typeof Success>;
+        const Reset = makeAction(resetType);
+        type Reset = M.AType<typeof Reset>;
 
-// type AsyncAction<F, E, A, X> = FetchAction<F> | FailureAction<E> | SuccessAction<A, X>;
+        const Action = M.makeADT('type')({
+            [submitType]: Submit,
+            [failureType]: Failure,
+            [successType]: Success,
+            [inflightType]: Inflight,
+            [resetType]: Reset,
+        });
 
-// function createAsyncReducer<
-//     F extends string,
-//     E extends string,
-//     A extends string
-// >(fetchType: F, failureType: E, successType: A) {
-//     return function <X, T extends AsyncAction<F, E, A, X>>(
-//         builder: ReducerBuilder<State, T, 'type'>,
-//         // builder: 'type' extends keyof T
-//         //     ? F | E | A extends keyof ValueByKeyByTag<T>['type']
-//         //     ? ReducerBuilder<State, T, 'type'>
-//         //     : never
-//         //     : never
-//     ) {
-//         return builder({
-//             [fetchType]: (a: FetchAction<F>) => State.transform({
-//                 Init: () => State.of.Pending({})
-//             }),
-//             [failureType]: (a: FailureAction<F>) => (s) => s,
-//             [successType]: (a: SuccessAction<A, X>) => (s) => s,
-//         } as any);
-//     }
-// }
+        const Init = makeSimpleState('Init');
+        const Submitting = makeSimpleState('Submitting');
+        const Left = makeState(
+            'Left',
+            M.make((F) => F.interface({
+                submitting: F.boolean(),
+                error: error(F),
+            })),
+        );
 
-// const Actions = M.makeADT('type')({
-//     fetch: makeAction('fetch'),
-//     failure: makePayloadAction(
-//         'failure',
-//         M.make((F) => F.interface({
-//             name: F.string(),
-//             message: F.string(),
-//         })),
-//     ),
-//     success: makePayloadAction(
-//         'success',
-//         M.make((F) => F.interface({
-//             val: F.stringLiteral('val'),
-//         })),
-//     ),
-// })
+        const Right = makeState(
+            'Right',
+            M.make((F) => F.interface({
+                submitting: F.boolean(),
+                result: result(F),
+            })),
+        );
 
-// const asyncBuilder = Actions.createReducer(State.of.Init({}));
+        const State = M.makeADT('state')({
+            Init,
+            Submitting,
+            Left,
+            Right,
+        });
 
-// const async = createAsyncReducer('fetch', 'failure', 'success')(asyncBuilder)
+        type State = M.AType<typeof State>
+
+        const reducer = Action.createReducer(State.of.Init({}))({
+            [submitType]: (_: Submit) => (s: State) => s,
+            [resetType]: (_: Reset) => (_: State) => State.of.Init({}),
+            [inflightType]: (_: Inflight) => State.transform({
+                Init: () => State.of.Submitting({}),
+                Left: ({ error }) => State.of.Left({
+                    error,
+                    submitting: true,
+                }),
+                Right: ({ result }) => State.of.Right({
+                    result,
+                    submitting: true,
+                }),
+            }),
+            [failureType]: ({ payload }: Failure) => State.transform({
+                Submitting: () => State.of.Left({
+                    error: payload,
+                    submitting: false,
+                }),
+                Left: () => State.of.Left({
+                    error: payload,
+                    submitting: false,
+                }),
+                Right: () => State.of.Left({
+                    error: payload,
+                    submitting: false,
+                }),
+            }),
+            [successType]: ({ payload }: Success) => State.transform({
+                Submitting: () => State.of.Right({
+                    result: payload,
+                    submitting: false,
+                }),
+                Left: () => State.of.Right({
+                    result: payload,
+                    submitting: false,
+                }),
+                Right: () => State.of.Right({
+                    result: payload,
+                    submitting: false,
+                }),
+            }),
+        } as any);
+
+        const foldStateToFormProps = State.matchStrict<{
+            isSubmitting: boolean;
+            error: O.Option<EO>;
+            result: O.Option<RO>;
+        }>({
+            Init: () => ({
+                isSubmitting: false,
+                error: O.none,
+                result: O.none,
+            }),
+            Submitting: () => ({
+                isSubmitting: true,
+                error: O.none,
+                result: O.none,
+            }),
+            Left: ({ error }) => ({
+                isSubmitting: false,
+                error: O.some(error),
+                result: O.none,
+            }),
+            Right: ({ result }) => ({
+                isSubmitting: false,
+                error: O.none,
+                result: O.some(result),
+            }),
+        });
+
+        return { Action, State, reducer, foldStateToFormProps };
+
+    }
+
+}

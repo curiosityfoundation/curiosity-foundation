@@ -39,19 +39,27 @@ import {
     fetchClaimedLicenses,
     getLicensesOnEnterLicensesRoute,
     getAccessTokenAndRedirect,
+    postClaimedLicenses,
 } from './cycles';
 import { AppConfigLive, accessAppConfigM } from './config';
+import {
+    ClaimLicenseFormAction,
+    ClaimLicenseFormState,
+    claimLicenseFormReducer,
+} from './claim-license-slice';
 
 export type AppState = {
     auth: AuthState;
     router: RouterState;
     claimedLicenses: ClaimedLicensesState;
     unclaimedLicenses: UnclaimedLicensesState;
+    claimLicenseForm: ClaimLicenseFormState;
 };
 
 export type Action = AuthAction
     | ClaimedLicensesAction
     | UnclaimedLicensesAction
+    | ClaimLicenseFormAction
     | RouterAction;
 
 const provideEnv = pipe(
@@ -103,6 +111,18 @@ export const submitNewLicenseForm = (accessToken: string) =>
                 authorization: accessToken,
             }),
         )),
+        provideEnv,
+        T.runPromise,
+    );
+
+export const submitClaimLicenseForm = (accessToken: string) =>
+    (data: DeviceId) => pipe(
+        accessAppConfigM((config) => pipe(
+            H.post(`${config.apiURL}/licenses/claim`, data),
+            H.withHeaders({
+                authorization: accessToken,
+            }),
+        )),
         T.tap((x) => info(String(x.status))),
         provideEnv,
         T.runPromise,
@@ -122,6 +142,7 @@ export const createStore: IO.IO<Store> = () => {
         cycle(logoutWithSPACycle),
         cycle(getAccessTokenAndRedirect),
         cycle(getTokenAndRedirectAfterLoggingIn),
+        cycle(postClaimedLicenses),
         cycle(fetchUnclaimedLicenses),
         cycle(getLicensesOnEnterLicensesRoute),
         cycle(fetchClaimedLicenses),
@@ -132,6 +153,7 @@ export const createStore: IO.IO<Store> = () => {
         router: connectRouter(history),
         claimedLicenses: claimedLicensesReducer,
         unclaimedLicenses: unclaimedLicensesReducer,
+        claimLicenseForm: claimLicenseFormReducer,
     });
 
     const store = configureStore({

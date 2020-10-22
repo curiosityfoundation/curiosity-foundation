@@ -82,6 +82,23 @@ const Router = L.all(
             checkJwt,
         ]
     }),
+    Express.Route({
+        name: 'index',
+        path: '/licenses/claim',
+        method: 'post',
+        handler: Express.accessRequestContextM(({ request }) => pipe(
+            { ...request.body, claimedBy: 'ADMIN' },
+            Licenses.decodeInsertClaimedLicense,
+            T.chain(Licenses.claimLicense),
+            T.map(({ doc }) => Express.routeResponse(200)({ claimedLicense: doc })),
+            T.mapError(() => Express.routeError(200)({}))
+        )),
+        middleware: [
+            cors({ origin: 'http://localhost:4200' }),
+            bodyParser.json(),
+            checkJwt,
+        ],
+    }),
 );
 
 const waitProcessExit =

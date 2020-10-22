@@ -46,6 +46,7 @@
     "@effect-ts/core": "^0.5.23",
     "@effect-ts/monocle": "^0.4.23",
     "@effect-ts/morphic": "^0.3.23",
+    "@hookform/resolvers": "^1.0.0",
     "@most/create": "^2.0.1",
     "@reduxjs/toolkit": "^1.4.0",
     "auth0-js": "^9.14.0",
@@ -75,6 +76,7 @@
     "pubnub-react": "^2.0.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-hook-form": "^6.9.5",
     "react-plotly.js": "^2.5.0",
     "react-redux": "^7.2.1",
     "react-router-dom": "5.2.0",
@@ -83,7 +85,8 @@
     "rpio": "^2.2.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.0.0",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "yup": "^0.29.3"
   },
   "devDependencies": {
     "@babel/core": "7.9.6",
