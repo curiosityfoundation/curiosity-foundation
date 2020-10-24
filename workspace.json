@@ -569,6 +569,55 @@
           }
         }
       }
+    },
+    "feature-kv-storage": {
+      "root": "libs/feature-kv-storage",
+      "sourceRoot": "libs/feature-kv-storage/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/feature-kv-storage/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/feature-kv-storage/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-kv-storage/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "adapter-local-storage": {
+      "root": "libs/adapter-local-storage",
+      "sourceRoot": "libs/adapter-local-storage/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/adapter-local-storage/tsconfig.lib.json"],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/adapter-local-storage/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/adapter-local-storage/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

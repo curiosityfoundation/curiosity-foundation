@@ -74,6 +74,12 @@
     },
     "adapter-fetch": {
       "tags": []
+    },
+    "feature-kv-storage": {
+      "tags": []
+    },
+    "adapter-local-storage": {
+      "tags": []
     }
   }
 }
