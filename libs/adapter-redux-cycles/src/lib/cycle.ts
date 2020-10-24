@@ -11,22 +11,22 @@ import * as RC from 'redux-cycles';
 import { encaseMost, runToMost, toMost } from './mostjs';
 
 type ReduxSources<State, A extends Action> = {
-    STATE: M.Stream<State>;
-    ACTION: M.Stream<A>;
+  STATE: M.Stream<State>;
+  ACTION: M.Stream<A>;
 };
 
 type ReduxSinks<O extends Action> = {
-    ACTION: M.Stream<O>;
+  ACTION: M.Stream<O>;
 };
 
 export type RCMain<State, A extends Action, O extends A> = RC.Main<ReduxSources<State, A>, ReduxSinks<O>>;
 
 export interface Cycle<R, State, A extends Action = Action, O extends Action = A> {
-    _A: A
-    _O: O
-    _R: R
-    _S: State
-    (action$: S.UIO<A>, state$: S.UIO<State>): S.UIO<O>;
+  _A: A
+  _O: O
+  _R: R
+  _S: State
+  (action$: S.UIO<A>, state$: S.UIO<State>): S.UIO<O>;
 }
 
 type AnyCycle = Cycle<any, any, any, any> | Cycle<any, any, any, never>;
@@ -37,59 +37,61 @@ type Act<K extends AnyCycle> = K['_A'];
 type AOut<K extends AnyCycle> = K['_O'];
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-    k: infer I
+  k: infer I
 ) => void
-    ? I
-    : never;
+  ? I
+  : never;
 
 type CyclesEnvType<CS extends A.NonEmptyArray<AnyCycle>> = UnionToIntersection<
-    Env<CS[number]>
+  Env<CS[number]>
 >;
 
 function toNever(_: any): never {
-    return undefined as never;
+  return undefined as never;
 };
 
 export function embed<CS extends A.NonEmptyArray<AnyCycle>>(
-    ...cycles: CS
+  ...cycles: CS
 ): (
-        provider: (
-            _: T.Effect<CyclesEnvType<CS>, never, unknown>
-        ) => T.Effect<T.DefaultEnv, never, unknown>
-    ) => RCMain<Sta<CS[number]>, Act<CS[number]>, AOut<CS[number]>> {
+    provider: (
+      _: T.Effect<CyclesEnvType<CS>, never, unknown>
+    ) => T.Effect<T.DefaultEnv, never, unknown>
+  ) => RCMain<Sta<CS[number]>, Act<CS[number]>, AOut<CS[number]>> {
 
-    type CSType = CS[number];
-    type Action = Act<CSType>;
-    type State = Sta<CSType>;
-    type ActionOut = AOut<CSType>;
-    type REnv = CyclesEnvType<CS>;
+  type CSType = CS[number];
+  type Action = Act<CSType>;
+  type State = Sta<CSType>;
+  type ActionOut = AOut<CSType>;
+  type REnv = CyclesEnvType<CS>;
 
-    // cannot convince typechecker that array is nonempty
-    return (provider) => (RC.combineCycles as any)(
-        ...pipe(
-            cycles as A.NonEmptyArray<Cycle<REnv, State, Action, ActionOut>>,
-            A.map(
-                (cycle): RCMain<State, Action, ActionOut> => ({
-                    ACTION,
-                    STATE,
-                }: ReduxSources<State, Action>) => ({
-                    ACTION: pipe(
-                        toMost(cycle(
-                            encaseMost(ACTION, toNever),
-                            encaseMost(STATE.sampleWith(ACTION), toNever),
-                        )),
-                        provider,
-                        runToMost,
-                    )
-                })
+  // cannot convince typechecker that array is nonempty
+  return (provider) => (RC.combineCycles as any)(
+    ...pipe(
+      cycles as A.NonEmptyArray<Cycle<REnv, State, Action, ActionOut>>,
+      A.map(
+        (cycle): RCMain<State, Action, ActionOut> => ({
+          ACTION,
+          STATE,
+        }: ReduxSources<State, Action>) => ({
+          ACTION: pipe(
+            toMost(
+              cycle(
+                encaseMost(ACTION, toNever),
+                encaseMost(STATE.sampleWith(ACTION.merge(M.periodic(1000))), toNever),
+              )
             ),
-        )
-    );
+            provider,
+            runToMost,
+          )
+        })
+      ),
+    )
+  );
 
 };
 
 export function cycle<State, A extends Action, O extends Action = A>(): <R>(
-    e: (action$: S.UIO<A>, state$: S.UIO<State>) => S.Stream<R, unknown, O>
+  e: (action$: S.UIO<A>, state$: S.UIO<State>) => S.Stream<R, unknown, O>
 ) => Cycle<R, State, A, O> {
-    return (e) => e as any
+  return (e) => e as any
 };
