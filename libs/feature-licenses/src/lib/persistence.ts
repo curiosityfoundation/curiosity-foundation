@@ -1,4 +1,4 @@
-import { has } from '@effect-ts/core/Classic/Has';
+import { tag } from '@effect-ts/core/Has';
 import * as O from '@effect-ts/core/Classic/Option';
 import * as T from '@effect-ts/core/Effect';
 import * as L from '@effect-ts/core/Effect/Layer';
@@ -108,7 +108,7 @@ const makeLicensePersistence = () => ({
 export interface LicensePersistence
     extends ReturnType<typeof makeLicensePersistence> { }
 
-export const LicensePersistence = has<LicensePersistence>()
+export const LicensePersistence = tag<LicensePersistence>()
 
 export const LicensePersistenceLive = L.fromConstructor(LicensePersistence)(
     makeLicensePersistence

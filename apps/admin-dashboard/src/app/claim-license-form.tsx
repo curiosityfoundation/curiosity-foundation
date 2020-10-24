@@ -9,9 +9,13 @@ import * as yup from 'yup';
 
 import { DeviceId } from '@curiosity-foundation/feature-licenses';
 import { AuthState } from '@curiosity-foundation/feature-auth';
+import {
+    ClaimLicenseFormState,
+    ClaimLicenseFormAction,
+    foldStateToFormProps,
+} from './claim-license-form-slice';
 
-import { AppState, submitClaimLicenseForm } from './store';
-import { ClaimLicenseFormState, ClaimLicenseFormAction, foldStateToFormProps } from './claim-license-slice';
+import { AppState } from './store';
 
 const schema = yup.object<DeviceId>().shape({
     deviceId: yup.string().min(8).max(32).required(),
@@ -20,7 +24,7 @@ const schema = yup.object<DeviceId>().shape({
 export const renderClaimLicenseForm = () => {
 
     const formState = useSelector((s: AppState) => s.claimLicenseForm);
-    const { isSubmitting, error, result } = foldStateToFormProps(formState);
+    const { error, result } = foldStateToFormProps(formState);
     const dispatch = useDispatch();
     const { control, errors, handleSubmit } = useForm<DeviceId, {}>({
         resolver: yupResolver(schema)
@@ -63,15 +67,17 @@ export const renderClaimLicenseForm = () => {
                     rules={{ required: true }}
                     defaultValue=''
                     render={({ onBlur, onChange, value }) => (
-                        <Form.Input
-                            type='text'
-                            value={value}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                        />
+                        <div>
+                            <Form.Input
+                                type='text'
+                                value={value}
+                                onBlur={onBlur}
+                                onChange={onChange}
+                            />
+                            {!!errors.deviceId && <p>{errors.deviceId.message}</p>}
+                        </div>
                     )}
                 />
-                {!!errors.deviceId && <p>{JSON.stringify(errors.deviceId)}</p>}
                 <Button
                     type='submit'
                     content='Claim License'

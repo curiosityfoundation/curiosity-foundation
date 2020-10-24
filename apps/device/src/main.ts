@@ -6,9 +6,9 @@ import * as RPIO from 'rpio';
 
 import { LoggerLive } from '@curiosity-foundation/feature-logging';
 import { PubnubClientLive } from '@curiosity-foundation/feature-messaging';
+import { RPIOLive } from '@curiosity-foundation/feature-device-io';
 
 import { app, AppConfigLive } from './app';
-import { RPIOLive } from 'libs/feature-device-io/src/lib/client';
 
 const provideAppConfig = pipe(
     {

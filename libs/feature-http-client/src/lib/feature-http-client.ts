@@ -4,7 +4,7 @@ import * as T from '@effect-ts/core/Effect'
 import * as F from '@effect-ts/core/Function'
 import * as L from '@effect-ts/core/Effect/Layer'
 import * as O from '@effect-ts/core/Classic/Option'
-import { has, Has } from '@effect-ts/core/Classic/Has'
+import { tag, Has } from '@effect-ts/core/Has'
 import { pipe } from '@effect-ts/core/Function'
 
 /* tested in the implementation packages */
@@ -152,7 +152,7 @@ export interface HTTPHeaders {
     headers: Record<string, string>
 }
 
-export const HTTPHeaders = has<HTTPHeaders>();
+export const HTTPHeaders = tag<HTTPHeaders>();
 
 export const HTTPHeadersLive = (headers: Record<string, string>) =>
     L.pure(HTTPHeaders)({ headers });
@@ -172,7 +172,7 @@ export interface HTTP {
     ops: HTTPOps
 }
 
-export const HTTP = has<HTTP>();
+export const HTTP = tag<HTTP>();
 
 export const HTTPLive = (ops: HTTPOps) => L.pure(HTTP)({ ops });
 
@@ -199,7 +199,7 @@ export interface MiddlewareStack {
     stack: RequestMiddleware[]
 }
 
-export const MiddlewareStack = has<MiddlewareStack>();
+export const MiddlewareStack = tag<MiddlewareStack>();
 
 export const HTTPMiddlewareStackLive = (stack: RequestMiddleware[] = []) =>
     L.pure(MiddlewareStack)({

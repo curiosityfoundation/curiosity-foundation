@@ -1,4 +1,4 @@
-import { has } from '@effect-ts/core/Classic/Has'
+import { tag } from '@effect-ts/core/Has'
 import * as T from '@effect-ts/core/Effect'
 import * as M from '@effect-ts/core/Effect/Managed'
 import * as L from '@effect-ts/core/Effect/Layer';
@@ -9,7 +9,7 @@ export interface MongoClient {
     client: MongoClient_;
 }
 
-export const MongoClient = has<MongoClient>();
+export const MongoClient = tag<MongoClient>();
 
 export const accessMongoClient = T.accessService(MongoClient);
 export const accessMongoClientM = T.accessServiceM(MongoClient);

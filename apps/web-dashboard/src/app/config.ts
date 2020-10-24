@@ -1,5 +1,5 @@
 import * as T from '@effect-ts/core/Effect';
-import { has } from '@effect-ts/core/Classic/Has';
+import { tag } from '@effect-ts/core/Has';
 import * as L from '@effect-ts/core/Effect/Layer';
 
 export type AppConfig = {
@@ -7,7 +7,7 @@ export type AppConfig = {
     writeChannel: string;
 };
 
-export const AppConfig = has<AppConfig>();
+export const AppConfig = tag<AppConfig>();
 
 export const AppConfigLive = (config: AppConfig) =>
     L.fromConstructor(AppConfig)(() => config)();

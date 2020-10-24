@@ -1,4 +1,4 @@
-import { has } from '@effect-ts/core/Classic/Has'
+import { tag } from '@effect-ts/core/Has'
 import * as T from '@effect-ts/core/Effect'
 import * as M from '@effect-ts/core/Effect/Managed'
 import * as L from '@effect-ts/core/Effect/Layer';
@@ -9,7 +9,7 @@ export interface PubnubClient {
     client: Pubnub;
 }
 
-export const PubnubClient = has<PubnubClient>();
+export const PubnubClient = tag<PubnubClient>();
 
 export const accessPubnubClient = T.accessService(PubnubClient);
 export const accessPubnubClientM = T.accessServiceM(PubnubClient);

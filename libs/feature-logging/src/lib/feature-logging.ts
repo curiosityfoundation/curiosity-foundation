@@ -1,5 +1,5 @@
 import * as T from '@effect-ts/core/Effect';
-import { has } from '@effect-ts/core/Classic/Has';
+import { tag } from '@effect-ts/core/Has';
 import * as L from '@effect-ts/core/Effect/Layer';
 
 export type Logger = {
@@ -8,7 +8,7 @@ export type Logger = {
     verbose: (message: string) => T.UIO<void>;
 };
 
-export const Logger = has<Logger>();
+export const Logger = tag<Logger>();
 
 export const LoggerLive = ({ info, warn, verbose }: {
     info: (message: string) => any;

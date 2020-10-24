@@ -1,5 +1,5 @@
 import * as T from '@effect-ts/core/Effect';
-import { has } from '@effect-ts/core/Classic/Has';
+import { tag } from '@effect-ts/core/Has';
 import * as L from '@effect-ts/core/Effect/Layer';
 
 export type Auth0Config = {
@@ -12,7 +12,7 @@ export type Auth0Config = {
     responseType: string;
 };
 
-export const Auth0Config = has<Auth0Config>();
+export const Auth0Config = tag<Auth0Config>();
 
 export const Auth0ConfigLive = (config: Auth0Config) =>
     L.fromConstructor(Auth0Config)(() => config)();

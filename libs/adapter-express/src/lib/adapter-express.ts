@@ -11,7 +11,7 @@ import * as C from '@effect-ts/core/Effect/Cause'
 import { pipe } from '@effect-ts/core/Function'
 import * as L from '@effect-ts/core/Effect/Layer'
 import * as M from '@effect-ts/core/Effect/Managed'
-import { has, Has } from '@effect-ts/core/Classic/Has'
+import { tag, Has } from '@effect-ts/core/Has'
 
 import { info, Logger, verbose } from '@curiosity-foundation/feature-logging';
 
@@ -49,7 +49,7 @@ interface RequestContext {
     request: Exp.Request;
 };
 
-const RequestContext = has<RequestContext>();
+const RequestContext = tag<RequestContext>();
 
 export const accessRequestContext = T.accessService(RequestContext);
 export const accessRequestContextM = T.accessServiceM(RequestContext);
@@ -123,7 +123,7 @@ export const on = <R = unknown, E = never, A = unknown>(
 
 interface ExpressRoute<K> { };
 
-const ExpressRoute = <K extends string>(k: K) => has<ExpressRoute<K>>();
+const ExpressRoute = <K extends string>(k: K) => tag<ExpressRoute<K>>();
 
 type RouteObj<K extends string, R = unknown, E = never, A = unknown> = {
     name: K,
@@ -187,7 +187,7 @@ export const useMiddlewares = (middlewares: connect.NextHandleFunction[]) =>
         T.asUnit,
     ));
 
-const ExpressServer = has<ExpressServer>();
+const ExpressServer = tag<ExpressServer>();
 
 const managedExpress = ({ hostname = '0.0.0.0', port }: ExpressConfig) =>
     M.makeInterruptible(

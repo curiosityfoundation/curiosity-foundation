@@ -1333,32 +1333,32 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
-"@effect-ts/core@^0.5.23":
-  version "0.5.23"
-  resolved "https://registry.yarnpkg.com/@effect-ts/core/-/core-0.5.23.tgz#3aeba8f64ef5bd2552306d105fce13356ea55b90"
-  integrity sha512-dQRRSoGPlNfeJ8+kEEJgnuG9JPILsxghMXpiZXMQjUGtE0KvIXXa7KiqzN0sH/OLSCQicCFPAlMKarRAeIN4IQ==
+"@effect-ts/core@^0.7.9":
+  version "0.7.9"
+  resolved "https://registry.yarnpkg.com/@effect-ts/core/-/core-0.7.9.tgz#31539d73541e1b012e222cd7564cf13f139f6402"
+  integrity sha512-H8/uoty2nDjcAkvlyx5n02CaqjZLamgLoRbB0dm6cRm0TzbA+zS7Zo8Z2kxOHV9vltgvlQ6aAfwgt71InqJQ2w==
   dependencies:
-    "@effect-ts/system" "^0.3.14"
+    "@effect-ts/system" "^0.5.4"
 
-"@effect-ts/monocle@^0.4.23":
-  version "0.4.23"
-  resolved "https://registry.yarnpkg.com/@effect-ts/monocle/-/monocle-0.4.23.tgz#94d9880e0866ba6b228d889c4f9db6f4e0656b8b"
-  integrity sha512-cuoiVUfDFAg2KBYwXmPsqKtqxVAqz6wWLw7SEtqoxWVmEgKJy2JpKODw0h6pEiMb2al/HyElobd24lhgZRNE4w==
+"@effect-ts/monocle@^0.6.9":
+  version "0.6.9"
+  resolved "https://registry.yarnpkg.com/@effect-ts/monocle/-/monocle-0.6.9.tgz#20bb36b1e2bb32b326a59594ac1cf47223a51060"
+  integrity sha512-UGklfc5/sdCI0d5vzZ5mVRfYJWo/CMJN0ILSruNrzGk4WvX80EV8cPkvboxXWr3b4BgTiBt2VhCezBrb/F6BKw==
   dependencies:
-    "@effect-ts/core" "^0.5.23"
+    "@effect-ts/core" "^0.7.9"
 
-"@effect-ts/morphic@^0.3.23":
-  version "0.3.23"
-  resolved "https://registry.yarnpkg.com/@effect-ts/morphic/-/morphic-0.3.23.tgz#90252c60dc75223d72782912aae304fa14721df2"
-  integrity sha512-7OoiyA/V+YQAu4Q38Mr+ja+tEMEEMrlpn6BAVaTJHfLtP6viPvZ+Qv2TH19ueLWQ6df+jn6Wy9Saa176pONLCw==
+"@effect-ts/morphic@^0.5.9":
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/@effect-ts/morphic/-/morphic-0.5.9.tgz#8a9c00b54c5c392b1249847f48acb850b6325e07"
+  integrity sha512-miXhFd9skg/aE5HWLu8mUn7GKsImc2quyNc4M/Gq38KC4XUNnd9dR82LATv8wx4g7n2GuVNOHCTgsiE+ltyX2g==
   dependencies:
-    "@effect-ts/core" "^0.5.23"
-    "@effect-ts/monocle" "^0.4.23"
+    "@effect-ts/core" "^0.7.9"
+    "@effect-ts/monocle" "^0.6.9"
 
-"@effect-ts/system@^0.3.14":
-  version "0.3.14"
-  resolved "https://registry.yarnpkg.com/@effect-ts/system/-/system-0.3.14.tgz#ae8a2f350e2f7af88d46dbb71297e5cfd6c19326"
-  integrity sha512-HbRVhImlYOcdVVlHBsQWjU+H3Z2yKqf4K2TxGrrJ8U9d4r7SNpzB+KQrMMFUkJtdF4mUXBzVkKwgOsuQD7XB3w==
+"@effect-ts/system@^0.5.4":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@effect-ts/system/-/system-0.5.4.tgz#f124197c571ac4a2819101bdaa2df64cededd5f2"
+  integrity sha512-lxRM98VVvuUnvHm/ZWqsyLeOxdlCAxmVAPayDl6/DvaNy3gP0BKdLHpH+2rPfGGhCGQgj1si1AIF13Jzv0Accw==
 
 "@fluentui/react-component-event-listener@~0.51.1":
   version "0.51.2"

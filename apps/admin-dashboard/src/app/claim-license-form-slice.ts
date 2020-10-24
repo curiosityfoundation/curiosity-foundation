@@ -1,4 +1,3 @@
-import * as O from '@effect-ts/core/Classic/Option';
 import * as M from '@effect-ts/morphic';
 
 import { ClaimedLicense, DeviceId } from '@curiosity-foundation/feature-licenses';

@@ -1,144 +1,156 @@
-import React from 'react';
-import moment from 'moment';
-import { Button, Icon, Menu, Header, Segment, Table,  } from 'semantic-ui-react';
+import React from 'react'
+import moment from 'moment'
+import { Button, Icon, Menu, Header, Segment, Table, Popup, } from 'semantic-ui-react'
 
-import { 
-    ClaimedLicenseList,
-    ClaimedLicensesState, 
-} from '@curiosity-foundation/feature-licenses';
+import {
+  ClaimedLicenseList,
+  ClaimedLicensesState,
+} from '@curiosity-foundation/feature-licenses'
 
 const ClaimedLicenseTable: React.FC<ClaimedLicenseList> = (props) => (
-    <Table celled compact>
-        <Table.Header>
-            <Table.Row>
-                <Table.HeaderCell>Device ID</Table.HeaderCell>
-                <Table.HeaderCell>Created</Table.HeaderCell>
-            </Table.Row>
-        </Table.Header>
-        <Table.Body>
-            {props.claimedLicenses.map((v, i) => (
-                <Table.Row key={i}>
-                    <Table.Cell>{v.deviceId}</Table.Cell>
-                    <Table.Cell>{moment(v.created).fromNow()}</Table.Cell>
-                </Table.Row>
-            ))}
-        </Table.Body>
-    </Table>
-);
+  <Table celled compact attached>
+    <Table.Header>
+      <Table.Row>
+        <Table.HeaderCell>Device ID</Table.HeaderCell>
+        <Table.HeaderCell>Created</Table.HeaderCell>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      {props.claimedLicenses.map((v, i) => (
+        <Table.Row key={i}>
+          <Table.Cell>{v.deviceId}</Table.Cell>
+          <Table.Cell>{moment(v.created).fromNow()}</Table.Cell>
+        </Table.Row>
+      ))}
+    </Table.Body>
+  </Table>
+)
+
+const TopMenu: React.FC<{ left: JSX.Element; right?: JSX.Element; }> =
+  (props) => (
+    <Menu attached secondary>
+      <Menu.Item>
+        {props.left}
+      </Menu.Item>
+      <Menu.Menu position='right'>
+        <Menu.Item>
+          {props.right || <div></div>}
+        </Menu.Item>
+      </Menu.Menu>
+    </Menu>
+  )
 
 export const renderClaimedLicenses = (props: {
-    onFetchClaimedLicensesClick: () => void;
+  onFetchClaimedLicensesClick: () => void
 }) => ClaimedLicensesState.match({
-    Init: () => (
-        <div>
-            <Menu attached>
-                <Menu.Item>
-                    <Header>Licenses Not Fetched</Header>
-                </Menu.Item>
-                <Menu.Menu position='right'>
-                    <Menu.Item>
-                        <Button onClick={props.onFetchClaimedLicensesClick}>
-                            Load Licenses
-                        </Button>
-                    </Menu.Item>
-                </Menu.Menu>
-            </Menu>
-            <Segment attached>
-                <Header size='small'>None To Show</Header>
-            </Segment>
-        </div>
-    ),
-    Pending: () => (
-        <div>
-            <Menu attached>
-                <Menu.Item>
-                    <Header>
-                        <Icon name='spinner' loading />
-                        Loading Licenses
-                    </Header>
-                </Menu.Item>
-            </Menu>
-            <Segment attached>
-                <Header size='small'>None To Show</Header>
-            </Segment>
-        </div>
-    ),
-    Left: ({ error, refreshing }) => (
-        <div>
-            <Menu attached>
-                <Menu.Item>
-                    <Header>
-                        {refreshing
-                            ? <Icon name='spinner' loading />
-                            : <Icon name='warning' loading />}
-                    </Header>
-                </Menu.Item>
-                <Menu.Menu position='right'>
-                    <Menu.Item>
-                        <Button
-                            disabled={refreshing}
-                            onClick={props.onFetchClaimedLicensesClick}
-                        >
-                            Refresh
-                    </Button>
-                    </Menu.Item>
-                </Menu.Menu>
-            </Menu>
-            <Segment attached>
-                <Header size='small'>{error}</Header>
-            </Segment>
-        </div>
-    ),
-    Right: ({ refreshing, result }) => (
-        <div>
-            <Menu attached>
-                <Menu.Item>
-                    <Header>
-                        {refreshing && <Icon name='spinner' loading />}
-                        Claimed Licenses
-                    </Header>
-                </Menu.Item>
-                <Menu.Menu position='right'>
-                    <Menu.Item>
-                        <Button
-                            disabled={refreshing}
-                            onClick={props.onFetchClaimedLicensesClick}
-                        >
-                            Refresh
-                        </Button>
-                    </Menu.Item>
-                </Menu.Menu>
-            </Menu>
-            <Segment attached>
-                <ClaimedLicenseTable claimedLicenses={Object.values(result.byId)} />
-            </Segment>
-        </div>
-    ),
-    Both: ({ error, refreshing, result }) => (
-        <div>
-            <Menu attached>
-                <Menu.Item>
-                    <Header>
-                        {refreshing
-                            ? <Icon name='spinner' loading />
-                            : <Icon name='warning' loading />}
-                        {error}
-                    </Header>
-                </Menu.Item>
-                <Menu.Menu position='right'>
-                    <Menu.Item>
-                        <Button
-                            disabled={refreshing}
-                            onClick={props.onFetchClaimedLicensesClick}
-                        >
-                            Refresh
-                    </Button>
-                    </Menu.Item>
-                </Menu.Menu>
-            </Menu>
-            <Segment attached>
-                <ClaimedLicenseTable claimedLicenses={Object.values(result.byId)} />
-            </Segment>
-        </div>
-    ),
-});
+  Init: () => (
+    <div>
+      <TopMenu
+        left={<Header>Licenses Not Fetched</Header>}
+        right={(
+          <Button onClick={props.onFetchClaimedLicensesClick}>
+            Load Licenses
+          </Button>
+        )}
+      />
+      <Segment attached>
+        <Header size='small'>None To Show</Header>
+      </Segment>
+    </div>
+  ),
+  Pending: () => (
+    <div>
+      <TopMenu
+        left={(
+          <Header>
+            <Icon name='spinner' loading />
+            Loading Licenses
+          </Header>
+        )}
+        right={(
+          <Button disabled>
+            Refresh
+          </Button>
+        )}
+      />
+      <Segment attached>
+        <Header size='small'>None To Show</Header>
+      </Segment>
+    </div>
+  ),
+  Left: ({ error, refreshing }) => (
+    <div>
+      <TopMenu
+        left={(
+          <Header>
+            {refreshing
+              ? <Icon name='spinner' loading />
+              : <Icon name='warning' />}
+            Claimed Licenses
+          </Header>
+        )}
+        right={(
+          <Button
+            disabled={refreshing}
+            onClick={props.onFetchClaimedLicensesClick}
+          >
+            Refresh
+          </Button>
+        )}
+      />
+      <Segment attached>
+        <Header size='small'>{error.message}</Header>
+      </Segment>
+    </div>
+  ),
+  Right: ({ refreshing, result }) => (
+    <div>
+      <TopMenu
+        left={(
+          <Header>
+            {refreshing && <Icon name='spinner' loading />}
+            Claimed Licenses
+          </Header>
+        )}
+        right={(
+          <Button
+            disabled={refreshing}
+            onClick={props.onFetchClaimedLicensesClick}
+          >
+            Refresh
+          </Button>
+        )}
+      />
+      <ClaimedLicenseTable claimedLicenses={Object.values(result.byId)} />
+    </div>
+  ),
+  Both: ({ error, refreshing, result }) => (
+    <div>
+      <TopMenu
+        left={(
+          <Header>
+            {refreshing
+              ? <Icon name='spinner' loading />
+              : !!error
+                ? <Popup
+                  trigger={<Icon name='warning' />}
+                  content={error.message}
+                  basic
+                />
+                : <div></div>}
+            Claimed Licenses
+          </Header>
+        )}
+        right={(
+          <Button
+            disabled={refreshing}
+            onClick={props.onFetchClaimedLicensesClick}
+          >
+            Refresh
+          </Button>
+        )}
+      />
+      <ClaimedLicenseTable claimedLicenses={Object.values(result.byId)} />
+    </div>
+  ),
+})

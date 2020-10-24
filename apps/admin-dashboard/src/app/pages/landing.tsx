@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 
 import { AuthAction } from '@curiosity-foundation/feature-auth';
 
-import { AppState } from './store';
-import { renderNavbar } from './navbar';
+import { AppState } from '../store';
+import { renderNavbar } from '../navbar';
 
 export const LandingPage = () => {
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
-import { LicensesPage } from './licenses-page';
-import { LandingPage } from './landing-page';
+import { LandingPage } from './pages/landing';
+import { LicensesPage } from './pages/licenses';
 
 export const App = () => (
     <div>
