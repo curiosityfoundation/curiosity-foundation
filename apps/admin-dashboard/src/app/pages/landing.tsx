@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { AuthAction } from '@curiosity-foundation/feature-auth';
+import { AuthAction } from '@curiosity-foundation/feature-auth2';
 
 import { AppState } from '../store';
 import { renderNavbar } from '../navbar';

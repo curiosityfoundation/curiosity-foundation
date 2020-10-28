@@ -15,13 +15,9 @@ import { info, LoggerLive } from '@curiosity-foundation/feature-logging';
 import {
   authReducer,
   AuthState,
-  loginWithSPACycle,
-  logoutWithSPACycle,
-  Auth0ConfigLive,
-  Auth0ClientLive,
   AuthAction,
-  getAccessTokenWithSPA
-} from '@curiosity-foundation/feature-auth';
+  AuthCycles,
+} from '@curiosity-foundation/feature-auth2';
 import {
   claimedLicensesReducer,
   ClaimedLicensesState,
@@ -29,10 +25,10 @@ import {
   unclaimedLicensesReducer,
   UnclaimedLicensesState,
   UnclaimedLicensesAction,
-  DeviceId,
 } from '@curiosity-foundation/feature-licenses';
 import * as H from '@curiosity-foundation/feature-http-client';
 import { FetchClientLive } from '@curiosity-foundation/adapter-fetch';
+import { Auth0ClientLive } from '@curiosity-foundation/adapter-auth0';
 
 import { APIAccessLive } from './api-access';
 import {
@@ -52,7 +48,7 @@ import {
   getLicensesAndRedirectOnAccessTokenSuccess,
   fetchClaimedLicenses,
   fetchUnclaimedLicenses,
-  
+
 } from './cycles';
 
 export type AppState = {
@@ -88,18 +84,27 @@ export const createStore: IO.IO<Store> = () => {
       APIAccessLive({
         APIURL: String(process.env.NX_API_URL),
       }),
-      Auth0ClientLive(new Auth0Client({
-        domain: String(process.env.NX_AUTH0_DOMAIN),
-        client_id: String(process.env.NX_AUTH0_CLIENT_ID),
-      })),
-      Auth0ConfigLive({
-        domain: String(process.env.NX_AUTH0_DOMAIN),
-        clientId: String(process.env.NX_AUTH0_CLIENT_ID),
-        redirectURI: window.location.origin,
-        responseType: 'token id_token',
-        scope: 'openid profile write:licenses read:licenses',
-        callbackURL: 'http://localhost:4200/callback',
-        audience: String(process.env.NX_AUTH0_AUDIENCE),
+      Auth0ClientLive({
+        client: new Auth0Client({
+          domain: String(process.env.NX_AUTH0_DOMAIN),
+          client_id: String(process.env.NX_AUTH0_CLIENT_ID),
+        }),
+        loginOpts: {
+          redirect_uri: window.location.origin,
+          clientID: String(process.env.NX_AUTH0_CLIENT_ID),
+          domain: String(process.env.NX_AUTH0_DOMAIN),
+          responseType: 'token id_token',
+        },
+        logoutOpts: {},
+        tokenOpts: {
+          redirect_uri: window.location.origin,
+          clientID: String(process.env.NX_AUTH0_CLIENT_ID),
+          domain: String(process.env.NX_AUTH0_DOMAIN),
+          responseType: 'token id_token',
+          audience: String(process.env.NX_AUTH0_AUDIENCE),
+          redirectUri: window.location.origin,
+          scope: 'openid profile write:licenses read:licenses',
+        }
       }),
       H.HTTPHeadersLive({
         cache: 'no-cache',
@@ -128,9 +133,10 @@ export const createStore: IO.IO<Store> = () => {
     cycle(getLicensesAndRedirectOnAccessTokenSuccess),
     cycle(fetchUnclaimedLicenses),
     cycle(fetchClaimedLicenses),
-    cycle(loginWithSPACycle),
-    cycle(logoutWithSPACycle),
-    cycle(getAccessTokenWithSPA),
+    cycle(AuthCycles.loginCycle),
+    cycle(AuthCycles.logoutCycle),
+    cycle(AuthCycles.getAccessTokenCycle),
+    cycle(AuthCycles.getUserCycle),
   )(provideEnv);
 
   const reducer = combineReducers({

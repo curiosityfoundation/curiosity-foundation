@@ -19,7 +19,6 @@
       "@curiosity-foundation/feature-licenses": [
         "libs/feature-licenses/src/index.ts"
       ],
-      "@curiosity-foundation/feature-auth": ["libs/feature-auth/src/index.ts"],
       "@curiosity-foundation/util-types": ["libs/util-types/src/index.ts"],
       "@curiosity-foundation/feature-db": ["libs/feature-db/src/index.ts"],
       "@curiosity-foundation/feature-logging": [
@@ -48,7 +47,11 @@
       ],
       "@curiosity-foundation/adapter-local-storage": [
         "libs/adapter-local-storage/src/index.ts"
-      ]
+      ],
+      "@curiosity-foundation/feature-auth2": [
+        "libs/feature-auth2/src/index.ts"
+      ],
+      "@curiosity-foundation/adapter-auth0": ["libs/adapter-auth0/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

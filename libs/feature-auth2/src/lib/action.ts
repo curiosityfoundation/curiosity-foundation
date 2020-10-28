@@ -12,10 +12,7 @@ export interface StartLogin extends M.AType<typeof StartLogin_> { }
 export interface StartLoginRaw extends M.EType<typeof StartLogin_> { }
 export const StartLogin = M.opaque<StartLoginRaw, StartLogin>()(StartLogin_);
 
-const LoginSuccess_ = makePayloadAction(
-    'LoginSuccess',
-    M.make((F) => User(F)),
-)
+const LoginSuccess_ = makeAction('LoginSuccess')
 
 export interface LoginSuccess extends M.AType<typeof LoginSuccess_> { }
 export interface LoginSuccessRaw extends M.EType<typeof LoginSuccess_> { }
@@ -53,6 +50,32 @@ export interface LogoutFailure extends M.AType<typeof LogoutFailure_> { }
 export interface LogoutFailureRaw extends M.EType<typeof LogoutFailure_> { }
 export const LogoutFailure = M.opaque<LogoutFailureRaw, LogoutFailure>()(LogoutFailure_);
 
+// Profile
+
+const GetUser_ = makeAction('GetUser');
+
+export interface GetUser extends M.AType<typeof GetUser_> { }
+export interface GetUserRaw extends M.EType<typeof GetUser_> { }
+export const GetUser = M.opaque<GetUserRaw, GetUser>()(GetUser_);
+
+const UserSuccess_ = makePayloadAction(
+    'UserSuccess',
+    M.make((F) => User(F)),
+)
+
+export interface UserSuccess extends M.AType<typeof UserSuccess_> { }
+export interface UserSuccessRaw extends M.EType<typeof UserSuccess_> { }
+export const UserSuccess = M.opaque<UserSuccessRaw, UserSuccess>()(UserSuccess_);
+
+const UserFailure_ = makePayloadAction(
+    'UserFailure',
+    M.make((F) => AuthError(F)),
+)
+
+export interface UserFailure extends M.AType<typeof UserFailure_> { }
+export interface UserFailureRaw extends M.EType<typeof UserFailure_> { }
+export const UserFailure = M.opaque<UserFailureRaw, UserFailure>()(UserFailure_);
+
 // Access Token
 
 const GetAccessToken_ = makeAction('GetAccessToken');
@@ -89,6 +112,9 @@ export const AuthAction = M.makeADT('type')({
     GetAccessToken,
     AccessTokenSuccess,
     AccessTokenFailure,
+    GetUser,
+    UserSuccess,
+    UserFailure,
 });
 
 export type AuthAction = M.AType<typeof AuthAction>;

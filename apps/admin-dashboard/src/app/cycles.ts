@@ -8,7 +8,7 @@ import { Action as ReduxAction } from 'redux'
 import {
   AuthAction,
   AuthState,
-} from '@curiosity-foundation/feature-auth'
+} from '@curiosity-foundation/feature-auth2'
 import {
   ClaimedLicensesAction,
   UnclaimedLicensesAction,
@@ -30,7 +30,13 @@ const filterAccessToken = (authState: AuthState) => pipe(
   AuthState.matchStrict<string[]>({
     LoggedOut: () => [],
     LoggingIn: () => [],
-    LoggedIn: ({ accessToken }) => [accessToken],
+    LoggedIn: ({ accessToken }) => pipe(
+      accessToken,
+      O.fold(
+        () => [],
+        ({ token }) => [token],
+      ),
+    ),
     LoggingOut: () => [],
   }),
   S.fromArray,
@@ -82,23 +88,30 @@ const matchError = APIAccessError.matchStrict({
 })
 
 export const getTokenAfterLoggingIn =
-  (action$: S.UIO<AuthAction>): S.UIO<Action> =>
+  (action$: S.UIO<AuthAction>): S.UIO<AuthAction> =>
     pipe(
       action$,
       S.filter(AuthAction.is.LoginSuccess),
-      S.map(() => AuthAction.of.GetAccessToken({})),
+      S.mapConcat(() =>
+        [
+          AuthAction.of.GetUser({}),
+          AuthAction.of.GetAccessToken({})
+        ],
+      ),
     )
 
 export const getLicensesAndRedirectOnAccessTokenSuccess =
-  (action$: S.UIO<Action>): S.UIO<Action> =>
+  (action$: S.UIO<AuthAction>): S.UIO<Action> =>
     pipe(
       action$,
       S.filter(AuthAction.is.AccessTokenSuccess),
-      S.mapConcat(() => [
-        push('/licenses'),
-        UnclaimedLicensesAction.of.FetchUnclaimedLicenses({}),
-        ClaimedLicensesAction.of.FetchClaimedLicenses({}),
-      ])
+      S.mapConcat(() =>
+        [
+          push('/licenses'),
+          UnclaimedLicensesAction.of.FetchUnclaimedLicenses({}),
+          ClaimedLicensesAction.of.FetchClaimedLicenses({}),
+        ]
+      )
     )
 
 export const fetchUnclaimedLicenses = (

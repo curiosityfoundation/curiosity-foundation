@@ -42,9 +42,6 @@
     "feature-licenses": {
       "tags": []
     },
-    "feature-auth": {
-      "tags": []
-    },
     "license-api": {
       "tags": []
     },
@@ -79,6 +76,12 @@
       "tags": []
     },
     "adapter-local-storage": {
+      "tags": []
+    },
+    "feature-auth2": {
+      "tags": []
+    },
+    "adapter-auth0": {
       "tags": []
     }
   }

@@ -8,7 +8,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import { DeviceId } from '@curiosity-foundation/feature-licenses';
-import { AuthState } from '@curiosity-foundation/feature-auth';
 import {
     ClaimLicenseFormState,
     ClaimLicenseFormAction,

@@ -288,29 +288,6 @@
         }
       }
     },
-    "feature-auth": {
-      "root": "libs/feature-auth",
-      "sourceRoot": "libs/feature-auth/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:lint",
-          "options": {
-            "linter": "eslint",
-            "tsConfig": ["libs/feature-auth/tsconfig.lib.json"],
-            "exclude": ["**/node_modules/**", "!libs/feature-auth/**/*"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/feature-auth/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
     "license-api": {
       "root": "apps/license-api",
       "sourceRoot": "apps/license-api/src",
@@ -614,6 +591,52 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/adapter-local-storage/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "feature-auth2": {
+      "root": "libs/feature-auth2",
+      "sourceRoot": "libs/feature-auth2/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/feature-auth2/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/feature-auth2/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-auth2/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "adapter-auth0": {
+      "root": "libs/adapter-auth0",
+      "sourceRoot": "libs/adapter-auth0/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/adapter-auth0/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/adapter-auth0/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/adapter-auth0/jest.config.js",
             "passWithNoTests": true
           }
         }

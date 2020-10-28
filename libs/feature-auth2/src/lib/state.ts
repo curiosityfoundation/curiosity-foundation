@@ -2,14 +2,15 @@ import * as M from '@effect-ts/morphic';
 
 import { makeSimpleState, makeState } from '@curiosity-foundation/util-types';
 
-import { User } from './model';
+import { User, AccessToken } from './model';
 
 const LoggedIn_ = makeState(
     'LoggedIn',
     M.make((F) => F.interface({
-        error: F.optional(F.string()),
-        user: User(F),
-        accessToken: F.optional(F.string()),
+        working: F.boolean(),
+        error: F.option(F.string()),
+        user: F.option(User(F)),
+        accessToken: F.option(AccessToken(F)),
     })),
 );
 
@@ -20,7 +21,7 @@ export const LoggedIn = M.opaque<LoggedInRaw, LoggedIn>()(LoggedIn_);
 const LoggedOut_ = makeState(
     'LoggedOut',
     M.make((F) => F.interface({
-        error: F.optional(F.string()),
+        error: F.option(F.string()),
     })),
 );
 
@@ -31,8 +32,8 @@ export const LoggedOut = M.opaque<LoggedOutRaw, LoggedOut>()(LoggedOut_);
 const LoggingOut_ = makeState(
     'LoggingOut',
     M.make((F) => F.interface({
-        user: User(F),
-        accessToken: F.optional(F.string()),
+        user: F.option(User(F)),
+        accessToken: F.option(AccessToken(F)),
     })),
 );
 

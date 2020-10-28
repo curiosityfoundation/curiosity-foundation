@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Grid, Segment } from 'semantic-ui-react'
 
-import { AuthAction } from '@curiosity-foundation/feature-auth'
+import { AuthAction } from '@curiosity-foundation/feature-auth2'
 import { ClaimedLicensesAction, UnclaimedLicensesAction } from '@curiosity-foundation/feature-licenses'
 
 import { AppState } from '../store'
