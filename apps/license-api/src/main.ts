@@ -8,11 +8,13 @@ import * as jwksRsa from 'jwks-rsa';
 import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
 import * as winston from 'winston';
+import { nanoid } from 'nanoid';
 
 import * as Express from '@curiosity-foundation/adapter-express';
 import * as Licenses from '@curiosity-foundation/feature-licenses';
 import { info, LoggerLive } from '@curiosity-foundation/feature-logging';
 import * as DB from '@curiosity-foundation/feature-db';
+import * as Nanoid from '@curiosity-foundation/adapter-nanoid';
 
 const { AUTH0_DOMAIN, PORT, AUTH0_AUDIENCE, MONGO_CONNECTION_STRING } = process.env;
 
@@ -124,6 +126,7 @@ pipe(
         String(MONGO_CONNECTION_STRING),
         { useUnifiedTopology: true },
     ))),
+    T.provideSomeLayer(Nanoid.NanoidUUIDLive(nanoid)),
     T.provideSomeLayer(LoggerLive(winston.createLogger({
         transports: [new winston.transports.Console({
             level: 'verbose',

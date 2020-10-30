@@ -641,6 +641,52 @@
           }
         }
       }
+    },
+    "feature-uuid": {
+      "root": "libs/feature-uuid",
+      "sourceRoot": "libs/feature-uuid/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/feature-uuid/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/feature-uuid/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-uuid/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "adapter-nanoid": {
+      "root": "libs/adapter-nanoid",
+      "sourceRoot": "libs/adapter-nanoid/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:lint",
+          "options": {
+            "linter": "eslint",
+            "tsConfig": ["libs/adapter-nanoid/tsconfig.lib.json"],
+            "exclude": ["**/node_modules/**", "!libs/adapter-nanoid/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/adapter-nanoid/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

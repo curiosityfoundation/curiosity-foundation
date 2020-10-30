@@ -83,6 +83,12 @@
     },
     "adapter-auth0": {
       "tags": []
+    },
+    "feature-uuid": {
+      "tags": []
+    },
+    "adapter-nanoid": {
+      "tags": []
     }
   }
 }

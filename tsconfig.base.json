@@ -51,7 +51,13 @@
       "@curiosity-foundation/feature-auth2": [
         "libs/feature-auth2/src/index.ts"
       ],
-      "@curiosity-foundation/adapter-auth0": ["libs/adapter-auth0/src/index.ts"]
+      "@curiosity-foundation/adapter-auth0": [
+        "libs/adapter-auth0/src/index.ts"
+      ],
+      "@curiosity-foundation/feature-uuid": ["libs/feature-uuid/src/index.ts"],
+      "@curiosity-foundation/adapter-nanoid": [
+        "libs/adapter-nanoid/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]
